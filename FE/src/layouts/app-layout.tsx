@@ -47,6 +47,7 @@ const productionSidebar: SidebarItem[] = [
 const masterSidebar: SidebarItem[] = [
   { to: "/master/companies", label: "Companies", icon: Building2 },
   { to: "/master/projects", label: "Projects", icon: FolderKanban },
+  { to: "/master/modules", label: "Modules", icon: LayoutDashboard },
   { to: "/master/drawing-types", label: "Drawing Types", icon: FileText },
   { to: "/master/disciplines", label: "Disciplines", icon: Wrench },
   { to: "/master/users", label: "Users", icon: Users },

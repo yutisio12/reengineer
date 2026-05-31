@@ -1,17 +1,19 @@
 import type {
   Company,
   Project,
+  Module,
   DrawingType,
   Discipline,
   User,
   UpdateCompanyPayload,
   UpdateProjectPayload,
+  UpdateModulePayload,
   UpdateDisciplinePayload,
   UpdateDrawingTypePayload,
   UpdateUserPayload,
 } from "../types"
 import { apiClient, createMockResponse, isDevMode } from "./client"
-import { mockCompanies, mockProjects, mockDrawingTypes, mockDisciplines, mockUsers, mockRevisions } from "./mock"
+import { mockCompanies, mockProjects, mockModules, mockDrawingTypes, mockDisciplines, mockUsers, mockRevisions } from "./mock"
 
 export async function fetchCompanies(): Promise<Company[]> {
   if (isDevMode()) return createMockResponse(mockCompanies)
@@ -66,6 +68,66 @@ export async function updateProject(
   }
   return apiClient<Project>(`/master/projects/${id}`, {
     method: "PATCH",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function fetchModules(projectId?: string): Promise<Module[]> {
+  if (isDevMode()) {
+    const filtered = projectId
+      ? mockModules.filter((m) => m.project_id === projectId)
+      : mockModules
+    return createMockResponse(
+      filtered.map((m) => ({
+        ...m,
+        project_name: mockProjects.find((p) => p.id === m.project_id)?.name,
+      })),
+    )
+  }
+  return apiClient<Module[]>("/master/modules", {
+    params: { project_id: projectId },
+  })
+}
+
+export async function updateModule(
+  id: string,
+  data: UpdateModulePayload,
+): Promise<Module> {
+  if (isDevMode()) {
+    const idx = mockModules.findIndex((m) => m.id === id)
+    if (idx === -1) throw new Error("Module not found")
+    mockModules[idx] = { ...mockModules[idx], ...data }
+    return createMockResponse({
+      ...mockModules[idx],
+      project_name: mockProjects.find((p) => p.id === mockModules[idx].project_id)?.name,
+    })
+  }
+  return apiClient<Module>(`/master/modules/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function createModule(
+  data: { name: string; code: string; project_id: string },
+): Promise<Module> {
+  if (isDevMode()) {
+    const item: Module = {
+      id: `m${Date.now()}`,
+      name: data.name,
+      code: data.code,
+      project_id: data.project_id,
+      is_active: true,
+      created_at: new Date().toISOString(),
+    }
+    mockModules.push(item)
+    return createMockResponse({
+      ...item,
+      project_name: mockProjects.find((p) => p.id === item.project_id)?.name,
+    })
+  }
+  return apiClient<Module>("/master/modules", {
+    method: "POST",
     body: JSON.stringify(data),
   })
 }

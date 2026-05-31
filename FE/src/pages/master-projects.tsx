@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useProjects, useCompanies, useUpdateProject, useCreateProject } from "../hooks/use-api"
 import { cn } from "../lib/utils"
+import { showConfirm, showToast } from "../lib/swal"
 import { Pencil, X, Plus } from "lucide-react"
 import type { Project } from "../types"
 
@@ -12,8 +13,13 @@ function EditModal({ item, onClose }: { item: Project; onClose: () => void }) {
   const [isActive, setIsActive] = useState(item.is_active)
   const mutation = useUpdateProject()
   const handleSave = async () => {
-    await mutation.mutateAsync({ id: item.id, data: { name, code, company_id: companyId, is_active: isActive } })
-    onClose()
+    const confirmed = await showConfirm("Save Changes?", "Update this project?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ id: item.id, data: { name, code, company_id: companyId, is_active: isActive } })
+      showToast("success", "Project updated")
+      onClose()
+    } catch { showToast("error", "Failed to update project") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -61,8 +67,13 @@ function AddModal({ onClose }: { onClose: () => void }) {
   const [companyId, setCompanyId] = useState("")
   const mutation = useCreateProject()
   const handleSave = async () => {
-    await mutation.mutateAsync({ name, code, company_id: companyId })
-    onClose()
+    const confirmed = await showConfirm("Add Project?", "Create a new project?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ name, code, company_id: companyId })
+      showToast("success", "Project created")
+      onClose()
+    } catch { showToast("error", "Failed to create project") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

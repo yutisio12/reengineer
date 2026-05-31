@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useDisciplines, useUpdateDiscipline, useCreateDiscipline } from "../hooks/use-api"
 import { cn } from "../lib/utils"
+import { showConfirm, showToast } from "../lib/swal"
 import { Pencil, X, Plus } from "lucide-react"
 import type { Discipline } from "../types"
 
@@ -9,8 +10,13 @@ function EditModal({ item, onClose }: { item: Discipline; onClose: () => void })
   const [code, setCode] = useState(item.code)
   const mutation = useUpdateDiscipline()
   const handleSave = async () => {
-    await mutation.mutateAsync({ id: item.id, data: { name, code } })
-    onClose()
+    const confirmed = await showConfirm("Save Changes?", "Update this discipline?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ id: item.id, data: { name, code } })
+      showToast("success", "Discipline updated")
+      onClose()
+    } catch { showToast("error", "Failed to update discipline") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -43,8 +49,13 @@ function AddModal({ onClose }: { onClose: () => void }) {
   const [code, setCode] = useState("")
   const mutation = useCreateDiscipline()
   const handleSave = async () => {
-    await mutation.mutateAsync({ name, code })
-    onClose()
+    const confirmed = await showConfirm("Add Discipline?", "Create a new discipline?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ name, code })
+      showToast("success", "Discipline created")
+      onClose()
+    } catch { showToast("error", "Failed to create discipline") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

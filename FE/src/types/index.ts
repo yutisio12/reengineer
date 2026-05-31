@@ -24,6 +24,16 @@ export interface DrawingType {
   code: string
 }
 
+export interface Module {
+  id: string
+  project_id: string
+  name: string
+  code: string
+  is_active: boolean
+  created_at: string
+  project_name?: string
+}
+
 export interface Discipline {
   id: string
   name: string
@@ -45,7 +55,7 @@ export interface Drawing {
   project_id: string
   discipline_id: string
   drawing_type_id: string
-  module_name: string
+  module_id: string
   document_no: string
   created_by: string
   assigned_drafter: string
@@ -57,6 +67,7 @@ export interface Drawing {
   project?: Project
   discipline?: Discipline
   drawing_type?: DrawingType
+  module?: Module
   creator?: User
   drafter?: User
 }
@@ -129,8 +140,9 @@ export interface LoginResponse {
 }
 
 export type UpdateCompanyPayload = Partial<Pick<Company, "name" | "code" | "is_active">>
+export type UpdateModulePayload = Partial<Pick<Module, "name" | "code" | "project_id" | "is_active">>
 export type UpdateProjectPayload = Partial<Pick<Project, "name" | "code" | "company_id" | "is_active">>
 export type UpdateDrawingTypePayload = Partial<Pick<DrawingType, "name" | "code">>
 export type UpdateDisciplinePayload = Partial<Pick<Discipline, "name" | "code">>
 export type UpdateUserPayload = Partial<Pick<User, "name" | "email" | "role" | "is_active">>
-export type UpdateDrawingPayload = Partial<Pick<Drawing, "company_id" | "project_id" | "discipline_id" | "drawing_type_id" | "module_name" | "document_no" | "assigned_drafter" | "description">>
+export type UpdateDrawingPayload = Partial<Pick<Drawing, "company_id" | "project_id" | "discipline_id" | "drawing_type_id" | "module_id" | "document_no" | "assigned_drafter" | "description">>

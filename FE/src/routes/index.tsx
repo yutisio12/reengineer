@@ -10,6 +10,7 @@ import DrawingDetailPage from "../pages/drawing-detail"
 import TransmitPage from "../pages/transmit"
 import { MasterCompaniesPage } from "../pages/master-companies"
 import { MasterProjectsPage } from "../pages/master-projects"
+import { MasterModulesPage } from "../pages/master-modules"
 import { MasterDrawingTypesPage } from "../pages/master-drawing-types"
 import { MasterDisciplinesPage } from "../pages/master-disciplines"
 import { MasterUsersPage } from "../pages/master-users"
@@ -45,6 +46,7 @@ export function AppRouter() {
 
               <Route path="/master/companies" element={<MasterCompaniesPage />} />
               <Route path="/master/projects" element={<MasterProjectsPage />} />
+              <Route path="/master/modules" element={<MasterModulesPage />} />
               <Route path="/master/drawing-types" element={<MasterDrawingTypesPage />} />
               <Route path="/master/disciplines" element={<MasterDisciplinesPage />} />
               <Route path="/master/users" element={<MasterUsersPage />} />

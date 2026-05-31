@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useTransmittableDrawings, useTransmit } from "../hooks/use-api"
 import { STATUS_LABEL, STATUS_COLOR } from "../lib/constants"
 import { cn, formatDate } from "../lib/utils"
+import { showConfirm, showToast } from "../lib/swal"
 import { Send } from "lucide-react"
 
 export default function TransmitPage() {
@@ -32,17 +33,23 @@ export default function TransmitPage() {
   }
 
   const handleTransmit = async () => {
+    const confirmed = await showConfirm(
+      "Confirm Transmit",
+      `Transmit ${selectedIds.size} drawing${selectedIds.size > 1 ? "s" : ""} to Production?`,
+    )
+    if (!confirmed) return
     try {
       await transmitMutation.mutateAsync({
         drawing_ids: Array.from(selectedIds),
         notes: notes || undefined,
       })
+      showToast("success", "Transmitted successfully")
       setSelectedIds(new Set())
       setNotes("")
       setShowConfirm(false)
       navigate("/drawings")
     } catch {
-      // error handled
+      showToast("error", "Transmit failed")
     }
   }
 

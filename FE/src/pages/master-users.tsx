@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useUsers, useUpdateUser, useCreateUser } from "../hooks/use-api"
 import { cn } from "../lib/utils"
+import { showConfirm, showToast } from "../lib/swal"
 import { Pencil, X, Plus } from "lucide-react"
 import { ROLES } from "../lib/constants"
 import type { User, UserRole } from "../lib/constants"
@@ -12,8 +13,13 @@ function EditModal({ item, onClose }: { item: User; onClose: () => void }) {
   const [isActive, setIsActive] = useState(item.is_active)
   const mutation = useUpdateUser()
   const handleSave = async () => {
-    await mutation.mutateAsync({ id: item.id, data: { name, email, role, is_active: isActive } })
-    onClose()
+    const confirmed = await showConfirm("Save Changes?", "Update this user?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ id: item.id, data: { name, email, role, is_active: isActive } })
+      showToast("success", "User updated")
+      onClose()
+    } catch { showToast("error", "Failed to update user") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -60,8 +66,13 @@ function AddModal({ onClose }: { onClose: () => void }) {
   const [role, setRole] = useState<UserRole>("drafter")
   const mutation = useCreateUser()
   const handleSave = async () => {
-    await mutation.mutateAsync({ name, email, role })
-    onClose()
+    const confirmed = await showConfirm("Add User?", "Create a new user?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ name, email, role })
+      showToast("success", "User created")
+      onClose()
+    } catch { showToast("error", "Failed to create user") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

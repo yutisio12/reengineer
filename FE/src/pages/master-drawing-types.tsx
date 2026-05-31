@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useDrawingTypes, useUpdateDrawingType, useCreateDrawingType } from "../hooks/use-api"
 import { cn } from "../lib/utils"
+import { showConfirm, showToast } from "../lib/swal"
 import { Pencil, X, Plus } from "lucide-react"
 import type { DrawingType } from "../types"
 
@@ -9,8 +10,13 @@ function EditModal({ item, onClose }: { item: DrawingType; onClose: () => void }
   const [code, setCode] = useState(item.code)
   const mutation = useUpdateDrawingType()
   const handleSave = async () => {
-    await mutation.mutateAsync({ id: item.id, data: { name, code } })
-    onClose()
+    const confirmed = await showConfirm("Save Changes?", "Update this drawing type?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ id: item.id, data: { name, code } })
+      showToast("success", "Drawing type updated")
+      onClose()
+    } catch { showToast("error", "Failed to update drawing type") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -43,8 +49,13 @@ function AddModal({ onClose }: { onClose: () => void }) {
   const [code, setCode] = useState("")
   const mutation = useCreateDrawingType()
   const handleSave = async () => {
-    await mutation.mutateAsync({ name, code })
-    onClose()
+    const confirmed = await showConfirm("Add Drawing Type?", "Create a new drawing type?")
+    if (!confirmed) return
+    try {
+      await mutation.mutateAsync({ name, code })
+      showToast("success", "Drawing type created")
+      onClose()
+    } catch { showToast("error", "Failed to create drawing type") }
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

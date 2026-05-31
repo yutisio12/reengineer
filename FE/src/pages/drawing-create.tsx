@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom"
 import {
   useCompanies,
   useProjects,
+  useModules,
   useDrawingTypes,
   useDisciplines,
   useUsers,
   useCreateDrawing,
 } from "../hooks/use-api"
+import { showConfirm, showToast } from "../lib/swal"
 
 export default function DrawingCreatePage() {
   const navigate = useNavigate()
@@ -18,13 +20,15 @@ export default function DrawingCreatePage() {
 
   const [companyId, setCompanyId] = useState("")
   const { data: projects } = useProjects(companyId)
+  const [projectId, setProjectId] = useState("")
+  const { data: modules } = useModules(projectId)
 
   const [form, setForm] = useState({
     company_id: "",
     project_id: "",
     discipline_id: "",
     drawing_type_id: "",
-    module_name: "",
+    module_id: "",
     document_no: "",
     assigned_drafter: "",
     description: "",
@@ -34,11 +38,14 @@ export default function DrawingCreatePage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    const confirmed = await showConfirm("Save Drawing?", "Create a new drawing?")
+    if (!confirmed) return
     try {
       await createMutation.mutateAsync(form)
+      showToast("success", "Drawing created")
       navigate("/drawings")
     } catch {
-      // error handled by query
+      showToast("error", "Failed to create drawing")
     }
   }
 
@@ -60,10 +67,12 @@ export default function DrawingCreatePage() {
                   value={form.company_id}
                   onChange={(e) => {
                     setCompanyId(e.target.value)
+                    setProjectId("")
                     setForm((f) => ({
                       ...f,
                       company_id: e.target.value,
                       project_id: "",
+                      module_id: "",
                     }))
                   }}
                   required
@@ -84,9 +93,10 @@ export default function DrawingCreatePage() {
                 </label>
                 <select
                   value={form.project_id}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, project_id: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    setProjectId(e.target.value)
+                    setForm((f) => ({ ...f, project_id: e.target.value, module_id: "" }))
+                  }}
                   required
                   disabled={!companyId}
                   className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 disabled:opacity-40"
@@ -95,6 +105,28 @@ export default function DrawingCreatePage() {
                   {projects?.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                  Module
+                </label>
+                <select
+                  value={form.module_id}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, module_id: e.target.value }))
+                  }
+                  required
+                  disabled={!form.project_id}
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 disabled:opacity-40"
+                >
+                  <option value="">Select Module</option>
+                  {modules?.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
                     </option>
                   ))}
                 </select>
@@ -146,22 +178,6 @@ export default function DrawingCreatePage() {
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
-                  Module Name
-                </label>
-                <input
-                  type="text"
-                  value={form.module_name}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, module_name: e.target.value }))
-                  }
-                  required
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
-                  placeholder="e.g. Main Pipeline"
-                />
               </div>
 
               <div>
@@ -244,12 +260,6 @@ export default function DrawingCreatePage() {
               CANCEL
             </button>
           </div>
-
-          {createMutation.isError && (
-            <div className="border-4 border-red-600 bg-red-100 px-4 py-3 font-mono text-sm font-bold text-red-800">
-              Failed to create drawing. Please try again.
-            </div>
-          )}
         </form>
       </div>
     </div>

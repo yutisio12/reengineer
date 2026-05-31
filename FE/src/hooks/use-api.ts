@@ -22,21 +22,25 @@ import { transmitDrawings } from "../api/transmit"
 import {
   fetchCompanies,
   fetchProjects,
+  fetchModules,
   fetchDrawingTypes,
   fetchDisciplines,
   fetchUsers,
   updateCompany,
   updateProject,
+  updateModule,
   updateDrawingType,
   updateDiscipline,
   updateUser,
   createCompany,
   createProject,
+  createModule,
   createDrawingType,
   createDiscipline,
   createUser,
   type UpdateCompanyPayload,
   type UpdateProjectPayload,
+  type UpdateModulePayload,
   type UpdateDrawingTypePayload,
   type UpdateDisciplinePayload,
   type UpdateUserPayload,
@@ -57,6 +61,13 @@ export function useProjects(companyId?: string) {
   return useQuery({
     queryKey: ["projects", companyId],
     queryFn: () => fetchProjects(companyId),
+  })
+}
+
+export function useModules(projectId?: string) {
+  return useQuery({
+    queryKey: ["modules", projectId],
+    queryFn: () => fetchModules(projectId),
   })
 }
 
@@ -93,6 +104,17 @@ export function useUpdateProject() {
       updateProject(id, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] })
+    },
+  })
+}
+
+export function useUpdateModule() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateModulePayload }) =>
+      updateModule(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["modules"] })
     },
   })
 }
@@ -143,6 +165,14 @@ export function useCreateProject() {
   return useMutation({
     mutationFn: (data: { name: string; code: string; company_id: string }) => createProject(data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["projects"] }),
+  })
+}
+
+export function useCreateModule() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { name: string; code: string; project_id: string }) => createModule(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["modules"] }),
   })
 }
 

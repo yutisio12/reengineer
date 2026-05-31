@@ -4,6 +4,7 @@ import {
   useDrawings,
   useCompanies,
   useProjects,
+  useModules,
   useDrawingTypes,
   useDisciplines,
 } from "../hooks/use-api"
@@ -22,6 +23,7 @@ export default function DrawingListPage() {
   const { data: companies } = useCompanies()
   const { data: projects } = useProjects(filters.company_id)
   const { data: drawingTypes } = useDrawingTypes()
+  const { data: modules } = useModules(filters.project_id)
   const { data: disciplines } = useDisciplines()
   const { data, isLoading } = useDrawings(filters)
 
@@ -117,6 +119,25 @@ export default function DrawingListPage() {
           </select>
 
           <select
+            value={filters.module_id || ""}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                module_id: e.target.value || undefined,
+                page: 1,
+              }))
+            }
+            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[150px]"
+          >
+            <option value="">All Modules</option>
+            {modules?.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name}
+              </option>
+            ))}
+          </select>
+
+          <select
             value={filters.status || ""}
             onChange={(e) =>
               setFilters((f) => ({
@@ -205,7 +226,7 @@ export default function DrawingListPage() {
                   <td className="px-4 py-3 font-bold">
                     {drawing.drawing_type?.code || "-"}
                   </td>
-                  <td className="px-4 py-3">{drawing.module_name}</td>
+                  <td className="px-4 py-3">{drawing.module?.name || "-"}</td>
                   <td className="px-4 py-3 font-bold">{drawing.document_no}</td>
                   <td className="px-4 py-3">
                     {drawing.creator?.name || "-"}

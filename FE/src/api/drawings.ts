@@ -7,6 +7,7 @@ export interface DrawingFilters {
   project_id?: string
   discipline_id?: string
   drawing_type_id?: string
+  module_id?: string
   status?: string
   page?: number
   per_page?: number
@@ -23,6 +24,7 @@ export async function fetchDrawings(
     if (filters.project_id) data = data.filter((d) => d.project_id === filters.project_id)
     if (filters.discipline_id) data = data.filter((d) => d.discipline_id === filters.discipline_id)
     if (filters.drawing_type_id) data = data.filter((d) => d.drawing_type_id === filters.drawing_type_id)
+    if (filters.module_id) data = data.filter((d) => d.module_id === filters.module_id)
     if (filters.status) data = data.filter((d) => d.status === filters.status)
     const page = filters.page || 1
     const perPage = filters.per_page || 10
@@ -56,7 +58,7 @@ export interface CreateDrawingPayload {
   project_id: string
   discipline_id: string
   drawing_type_id: string
-  module_name: string
+  module_id: string
   document_no: string
   assigned_drafter: string
   description?: string
