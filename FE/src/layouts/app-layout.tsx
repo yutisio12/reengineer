@@ -47,6 +47,7 @@ const productionSidebar: SidebarItem[] = [
 const masterSidebar: SidebarItem[] = [
   { to: "/master/companies", label: "Companies", icon: Building2 },
   { to: "/master/projects", label: "Projects", icon: FolderKanban },
+  { to: "/master/drawing-types", label: "Drawing Types", icon: FileText },
   { to: "/master/disciplines", label: "Disciplines", icon: Wrench },
   { to: "/master/users", label: "Users", icon: Users },
 ]
@@ -65,7 +66,7 @@ export function AppLayout() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white">
+      <div className="flex h-full items-center justify-center bg-white">
         <div className="border-4 border-black px-8 py-4 text-xl font-bold font-mono">
           LOADING...
         </div>

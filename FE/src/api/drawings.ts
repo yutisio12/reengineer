@@ -1,11 +1,12 @@
-import type { Drawing, PaginatedResponse } from "../types"
+import type { Drawing, PaginatedResponse, UpdateDrawingPayload } from "../types"
 import { apiClient, createMockResponse, isDevMode } from "./client"
-import { enrichDrawings, mockPaginatedDrawings } from "./mock"
+import { enrichDrawings, mockDrawings, mockDrawingTypes, mockPaginatedDrawings } from "./mock"
 
 export interface DrawingFilters {
   company_id?: string
   project_id?: string
   discipline_id?: string
+  drawing_type_id?: string
   status?: string
   page?: number
   per_page?: number
@@ -21,6 +22,7 @@ export async function fetchDrawings(
     if (filters.company_id) data = data.filter((d) => d.company_id === filters.company_id)
     if (filters.project_id) data = data.filter((d) => d.project_id === filters.project_id)
     if (filters.discipline_id) data = data.filter((d) => d.discipline_id === filters.discipline_id)
+    if (filters.drawing_type_id) data = data.filter((d) => d.drawing_type_id === filters.drawing_type_id)
     if (filters.status) data = data.filter((d) => d.status === filters.status)
     const page = filters.page || 1
     const perPage = filters.per_page || 10
@@ -53,6 +55,7 @@ export interface CreateDrawingPayload {
   company_id: string
   project_id: string
   discipline_id: string
+  drawing_type_id: string
   module_name: string
   document_no: string
   assigned_drafter: string
@@ -70,11 +73,33 @@ export async function createDrawing(
       status: "assigned",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      drawing_type: mockDrawingTypes.find((dt) => dt.id === payload.drawing_type_id),
     })
   }
   return apiClient<Drawing>("/drawings", {
     method: "POST",
     body: JSON.stringify(payload),
+  })
+}
+
+export async function updateDrawing(
+  id: string,
+  data: UpdateDrawingPayload,
+): Promise<Drawing> {
+  if (isDevMode()) {
+    const idx = mockDrawings.findIndex((d) => d.id === id)
+    if (idx === -1) throw new Error("Drawing not found")
+    mockDrawings[idx] = {
+      ...mockDrawings[idx],
+      ...data,
+      updated_at: new Date().toISOString(),
+    }
+    const all = enrichDrawings()
+    return createMockResponse(all.find((d) => d.id === id)!)
+  }
+  return apiClient<Drawing>(`/drawings/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
   })
 }
 

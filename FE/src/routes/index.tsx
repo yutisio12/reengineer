@@ -8,12 +8,11 @@ import DrawingListPage from "../pages/drawing-list"
 import DrawingCreatePage from "../pages/drawing-create"
 import DrawingDetailPage from "../pages/drawing-detail"
 import TransmitPage from "../pages/transmit"
-import {
-  MasterCompaniesPage,
-  MasterProjectsPage,
-  MasterDisciplinesPage,
-  MasterUsersPage,
-} from "../pages/master-data"
+import { MasterCompaniesPage } from "../pages/master-companies"
+import { MasterProjectsPage } from "../pages/master-projects"
+import { MasterDrawingTypesPage } from "../pages/master-drawing-types"
+import { MasterDisciplinesPage } from "../pages/master-disciplines"
+import { MasterUsersPage } from "../pages/master-users"
 import ProductionPage from "../pages/production"
 
 const queryClient = new QueryClient({
@@ -46,6 +45,7 @@ export function AppRouter() {
 
               <Route path="/master/companies" element={<MasterCompaniesPage />} />
               <Route path="/master/projects" element={<MasterProjectsPage />} />
+              <Route path="/master/drawing-types" element={<MasterDrawingTypesPage />} />
               <Route path="/master/disciplines" element={<MasterDisciplinesPage />} />
               <Route path="/master/users" element={<MasterUsersPage />} />
             </Route>

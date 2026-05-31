@@ -3,6 +3,7 @@ import {
   fetchDrawings,
   fetchDrawing,
   createDrawing,
+  updateDrawing,
   fetchTransmittableDrawings,
   type DrawingFilters,
   type CreateDrawingPayload,
@@ -21,9 +22,27 @@ import { transmitDrawings } from "../api/transmit"
 import {
   fetchCompanies,
   fetchProjects,
+  fetchDrawingTypes,
   fetchDisciplines,
   fetchUsers,
+  updateCompany,
+  updateProject,
+  updateDrawingType,
+  updateDiscipline,
+  updateUser,
+  createCompany,
+  createProject,
+  createDrawingType,
+  createDiscipline,
+  createUser,
+  type UpdateCompanyPayload,
+  type UpdateProjectPayload,
+  type UpdateDrawingTypePayload,
+  type UpdateDisciplinePayload,
+  type UpdateUserPayload,
 } from "../api/master-data"
+import type { UpdateDrawingPayload } from "../api/drawings"
+import type { UserRole } from "../lib/constants"
 import { getMe } from "../api/auth"
 
 export function useMe() {
@@ -38,8 +57,11 @@ export function useProjects(companyId?: string) {
   return useQuery({
     queryKey: ["projects", companyId],
     queryFn: () => fetchProjects(companyId),
-    enabled: !!companyId,
   })
+}
+
+export function useDrawingTypes() {
+  return useQuery({ queryKey: ["drawing-types"], queryFn: fetchDrawingTypes })
 }
 
 export function useDisciplines() {
@@ -50,6 +72,113 @@ export function useUsers(role?: string) {
   return useQuery({
     queryKey: ["users", role],
     queryFn: () => fetchUsers(role),
+  })
+}
+
+export function useUpdateCompany() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateCompanyPayload }) =>
+      updateCompany(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["companies"] })
+    },
+  })
+}
+
+export function useUpdateProject() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateProjectPayload }) =>
+      updateProject(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["projects"] })
+    },
+  })
+}
+
+export function useUpdateDrawingType() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateDrawingTypePayload }) =>
+      updateDrawingType(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["drawing-types"] })
+    },
+  })
+}
+
+export function useUpdateDiscipline() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateDisciplinePayload }) =>
+      updateDiscipline(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["disciplines"] })
+    },
+  })
+}
+
+export function useUpdateUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateUserPayload }) =>
+      updateUser(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["users"] })
+    },
+  })
+}
+
+export function useCreateCompany() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { name: string; code: string }) => createCompany(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["companies"] }),
+  })
+}
+
+export function useCreateProject() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { name: string; code: string; company_id: string }) => createProject(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["projects"] }),
+  })
+}
+
+export function useCreateDrawingType() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { name: string; code: string }) => createDrawingType(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["drawing-types"] }),
+  })
+}
+
+export function useCreateDiscipline() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { name: string; code: string }) => createDiscipline(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["disciplines"] }),
+  })
+}
+
+export function useCreateUser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { name: string; email: string; role: UserRole }) => createUser(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
+  })
+}
+
+export function useUpdateDrawing() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateDrawingPayload }) =>
+      updateDrawing(id, data),
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ["drawing", variables.id] })
+      qc.invalidateQueries({ queryKey: ["drawings"] })
+    },
   })
 }
 

@@ -4,6 +4,7 @@ import {
   useDrawings,
   useCompanies,
   useProjects,
+  useDrawingTypes,
   useDisciplines,
 } from "../hooks/use-api"
 import type { DrawingFilters } from "../api/drawings"
@@ -20,6 +21,7 @@ export default function DrawingListPage() {
 
   const { data: companies } = useCompanies()
   const { data: projects } = useProjects(filters.company_id)
+  const { data: drawingTypes } = useDrawingTypes()
   const { data: disciplines } = useDisciplines()
   const { data, isLoading } = useDrawings(filters)
 
@@ -96,6 +98,25 @@ export default function DrawingListPage() {
           </select>
 
           <select
+            value={filters.drawing_type_id || ""}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                drawing_type_id: e.target.value || undefined,
+                page: 1,
+              }))
+            }
+            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[150px]"
+          >
+            <option value="">All Types</option>
+            {drawingTypes?.map((dt) => (
+              <option key={dt.id} value={dt.id}>
+                {dt.code}
+              </option>
+            ))}
+          </select>
+
+          <select
             value={filters.status || ""}
             onChange={(e) =>
               setFilters((f) => ({
@@ -130,6 +151,9 @@ export default function DrawingListPage() {
                 Discipline
               </th>
               <th className="text-left px-4 py-3 border-r-4 border-white/20">
+                Type
+              </th>
+              <th className="text-left px-4 py-3 border-r-4 border-white/20">
                 Module
               </th>
               <th className="text-left px-4 py-3 border-r-4 border-white/20">
@@ -150,13 +174,13 @@ export default function DrawingListPage() {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center font-bold">
+                <td colSpan={10} className="px-4 py-12 text-center font-bold">
                   LOADING...
                 </td>
               </tr>
             ) : data?.data.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center font-bold">
+                <td colSpan={10} className="px-4 py-12 text-center font-bold">
                   NO DATA FOUND
                 </td>
               </tr>
@@ -177,6 +201,9 @@ export default function DrawingListPage() {
                   </td>
                   <td className="px-4 py-3">
                     {drawing.discipline?.name || "-"}
+                  </td>
+                  <td className="px-4 py-3 font-bold">
+                    {drawing.drawing_type?.code || "-"}
                   </td>
                   <td className="px-4 py-3">{drawing.module_name}</td>
                   <td className="px-4 py-3 font-bold">{drawing.document_no}</td>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import {
   useCompanies,
   useProjects,
+  useDrawingTypes,
   useDisciplines,
   useUsers,
   useCreateDrawing,
@@ -11,6 +12,7 @@ import {
 export default function DrawingCreatePage() {
   const navigate = useNavigate()
   const { data: companies } = useCompanies()
+  const { data: drawingTypes } = useDrawingTypes()
   const { data: disciplines } = useDisciplines()
   const { data: drafters } = useUsers("drafter")
 
@@ -21,6 +23,7 @@ export default function DrawingCreatePage() {
     company_id: "",
     project_id: "",
     discipline_id: "",
+    drawing_type_id: "",
     module_name: "",
     document_no: "",
     assigned_drafter: "",
@@ -116,6 +119,30 @@ export default function DrawingCreatePage() {
                   {disciplines?.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                  Drawing Type
+                </label>
+                <select
+                  value={form.drawing_type_id}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      drawing_type_id: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+                >
+                  <option value="">Select Type</option>
+                  {drawingTypes?.map((dt) => (
+                    <option key={dt.id} value={dt.id}>
+                      {dt.code} — {dt.name}
                     </option>
                   ))}
                 </select>

@@ -6,10 +6,16 @@ import {
   usePerformAction,
   useRevisions,
   useCreateRevision,
+  useUpdateDrawing,
+  useCompanies,
+  useProjects,
+  useDrawingTypes,
+  useDisciplines,
+  useUsers,
 } from "../hooks/use-api"
 import { STATUS_LABEL, STATUS_COLOR } from "../lib/constants"
 import { cn, formatDate } from "../lib/utils"
-import { Undo2, Play, Square, Check, Send, Upload, X, FileText } from "lucide-react"
+import { Undo2, Play, Square, Check, Send, Upload, X, FileText, Pencil } from "lucide-react"
 import type { PerformActionPayload } from "../api/activities"
 import type { CreateRevisionPayload } from "../api/revisions"
 import { uploadFile } from "../api/revisions"
@@ -62,6 +68,7 @@ export default function DrawingDetailPage() {
 
 function DrawingHeader({ drawingId }: { drawingId: string }) {
   const { data: drawing, isLoading } = useDrawing(drawingId)
+  const [showEdit, setShowEdit] = useState(false)
 
   if (isLoading || !drawing) {
     return (
@@ -72,30 +79,147 @@ function DrawingHeader({ drawingId }: { drawingId: string }) {
   }
 
   return (
-    <div className="border-4 border-black bg-white p-6 mb-4">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <h2 className="text-xl font-mono font-bold uppercase">
-            {drawing.document_no}
-          </h2>
-          <p className="font-mono text-sm text-gray-600">
-            {drawing.company?.name} / {drawing.project?.name} /{" "}
-            {drawing.discipline?.name} / {drawing.module_name}
-          </p>
-          <p className="font-mono text-xs text-gray-500">
-            Created by {drawing.creator?.name || "-"} on{" "}
-            {formatDate(drawing.created_at)} &middot; Drafter:{" "}
-            {drawing.drafter?.name || "-"}
-          </p>
+    <>
+      <div className="border-4 border-black bg-white p-6 mb-4">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <h2 className="text-xl font-mono font-bold uppercase">
+              {drawing.document_no}
+            </h2>
+            <p className="font-mono text-sm text-gray-600">
+              {drawing.company?.name} / {drawing.project?.name} /{" "}
+              {drawing.discipline?.name} /{" "}
+              {drawing.drawing_type?.name || drawing.drawing_type?.code} /{" "}
+              {drawing.module_name}
+            </p>
+            <p className="font-mono text-xs text-gray-500">
+              Created by {drawing.creator?.name || "-"} on{" "}
+              {formatDate(drawing.created_at)} &middot; Drafter:{" "}
+              {drawing.drafter?.name || "-"}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowEdit(true)}
+              className="flex items-center gap-1 bg-black text-white font-mono font-bold text-xs uppercase px-3 py-2 border-2 border-black hover:bg-white hover:text-black transition-all"
+            >
+              <Pencil size={12} /> Edit
+            </button>
+            <span
+              className={cn(
+                "px-4 py-2 border-2 border-black font-bold text-xs uppercase",
+                STATUS_COLOR[drawing.status],
+              )}
+            >
+              {STATUS_LABEL[drawing.status]}
+            </span>
+          </div>
         </div>
-        <span
-          className={cn(
-            "px-4 py-2 border-2 border-black font-bold text-xs uppercase",
-            STATUS_COLOR[drawing.status],
-          )}
-        >
-          {STATUS_LABEL[drawing.status]}
-        </span>
+      </div>
+      {showEdit && <EditDrawingModal drawingId={drawingId} onClose={() => setShowEdit(false)} />}
+    </>
+  )
+}
+
+function EditDrawingModal({
+  drawingId,
+  onClose,
+}: {
+  drawingId: string
+  onClose: () => void
+}) {
+  const { data: drawing } = useDrawing(drawingId)
+  const { data: companies } = useCompanies()
+  const { data: drawingTypes } = useDrawingTypes()
+  const { data: disciplines } = useDisciplines()
+  const { data: drafters } = useUsers("drafter")
+  const updateMutation = useUpdateDrawing()
+
+  const [companyId, setCompanyId] = useState(drawing?.company_id || "")
+  const { data: projects } = useProjects(companyId)
+
+  const [form, setForm] = useState({
+    company_id: drawing?.company_id || "",
+    project_id: drawing?.project_id || "",
+    discipline_id: drawing?.discipline_id || "",
+    drawing_type_id: drawing?.drawing_type_id || "",
+    module_name: drawing?.module_name || "",
+    document_no: drawing?.document_no || "",
+    assigned_drafter: drawing?.assigned_drafter || "",
+    description: drawing?.description || "",
+  })
+
+  if (!drawing) return null
+
+  const handleSave = async () => {
+    await updateMutation.mutateAsync({ id: drawingId, data: form })
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
+      <div className="border-4 border-black bg-white p-6 w-full max-w-2xl my-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-mono font-bold text-sm uppercase">Edit Drawing — {drawing.document_no}</h3>
+          <button onClick={onClose} className="hover:text-red-600"><X size={18} /></button>
+        </div>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-mono text-xs font-bold uppercase mb-2">Company</label>
+              <select value={form.company_id} onChange={(e) => { setCompanyId(e.target.value); setForm((f) => ({ ...f, company_id: e.target.value, project_id: "" })) }} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50">
+                <option value="">Select</option>
+                {companies?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block font-mono text-xs font-bold uppercase mb-2">Project</label>
+              <select value={form.project_id} onChange={(e) => setForm((f) => ({ ...f, project_id: e.target.value }))} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 disabled:opacity-40" disabled={!companyId}>
+                <option value="">Select</option>
+                {projects?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block font-mono text-xs font-bold uppercase mb-2">Discipline</label>
+              <select value={form.discipline_id} onChange={(e) => setForm((f) => ({ ...f, discipline_id: e.target.value }))} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50">
+                <option value="">Select</option>
+                {disciplines?.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block font-mono text-xs font-bold uppercase mb-2">Drawing Type</label>
+              <select value={form.drawing_type_id} onChange={(e) => setForm((f) => ({ ...f, drawing_type_id: e.target.value }))} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50">
+                <option value="">Select</option>
+                {drawingTypes?.map((dt) => <option key={dt.id} value={dt.id}>{dt.code} — {dt.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block font-mono text-xs font-bold uppercase mb-2">Module Name</label>
+              <input value={form.module_name} onChange={(e) => setForm((f) => ({ ...f, module_name: e.target.value }))} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50" />
+            </div>
+            <div>
+              <label className="block font-mono text-xs font-bold uppercase mb-2">Document No</label>
+              <input value={form.document_no} onChange={(e) => setForm((f) => ({ ...f, document_no: e.target.value }))} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50" />
+            </div>
+            <div>
+              <label className="block font-mono text-xs font-bold uppercase mb-2">Assign Drafter</label>
+              <select value={form.assigned_drafter} onChange={(e) => setForm((f) => ({ ...f, assigned_drafter: e.target.value }))} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50">
+                <option value="">Select</option>
+                {drafters?.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block font-mono text-xs font-bold uppercase mb-2">Notes</label>
+            <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={2} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50" />
+          </div>
+        </div>
+        <div className="flex gap-3 mt-6">
+          <button onClick={handleSave} disabled={updateMutation.isPending} className="bg-green-600 text-white font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-green-700 disabled:opacity-50 transition-all">
+            {updateMutation.isPending ? "SAVING..." : "SAVE"}
+          </button>
+          <button onClick={onClose} className="bg-white text-black font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-black hover:text-white transition-all">CANCEL</button>
+        </div>
       </div>
     </div>
   )
