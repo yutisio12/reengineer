@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Outlet, Link, useLocation, Navigate, useNavigate } from "react-router-dom"
 import { useAuth } from "../providers/auth-provider"
 import {
@@ -10,11 +11,13 @@ import {
   Wrench,
   Users,
   ChevronRight,
+  ChevronDown,
   LayoutDashboard,
+  BarChart3,
 } from "lucide-react"
 import { cn } from "../lib/utils"
 
-type ModuleId = "drawing" | "production" | "master"
+type ModuleId = "dashboard" | "drawing" | "production" | "master"
 
 interface Module {
   id: ModuleId
@@ -28,42 +31,113 @@ interface SidebarItem {
   icon: typeof FileText
 }
 
+interface SidebarGroup {
+  label: string
+  icon?: typeof FileText
+  items: SidebarItem[]
+}
+
 const modules: Module[] = [
+  { id: "dashboard", label: "Dashboard", path: "/" },
   { id: "drawing", label: "Drawing Activity", path: "/drawings" },
   { id: "production", label: "Production", path: "/production" },
   { id: "master", label: "Master Data", path: "/master/companies" },
 ]
 
-const drawingSidebar: SidebarItem[] = [
-  { to: "/drawings", label: "List Drawing", icon: FileText },
-  { to: "/drawings/create", label: "Create Drawing", icon: Plus },
-  { to: "/transmit", label: "Transmit", icon: Send },
+const dashboardSidebar: SidebarGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { to: "/", label: "Dashboard", icon: BarChart3 },
+    ],
+  },
 ]
 
-const productionSidebar: SidebarItem[] = [
-  { to: "/production", label: "Production List", icon: LayoutDashboard },
+const drawingSidebar: SidebarGroup[] = [
+  {
+    label: "Drawing",
+    items: [
+      { to: "/drawings", label: "List Drawing", icon: FileText },
+      { to: "/drawings/create", label: "Create Drawing", icon: Plus },
+    ],
+  },
+  {
+    label: "Transmit",
+    items: [
+      { to: "/transmit", label: "Transmit Drawing", icon: Send },
+    ],
+  },
 ]
 
-const masterSidebar: SidebarItem[] = [
-  { to: "/master/companies", label: "Companies", icon: Building2 },
-  { to: "/master/projects", label: "Projects", icon: FolderKanban },
-  { to: "/master/modules", label: "Modules", icon: LayoutDashboard },
-  { to: "/master/drawing-types", label: "Drawing Types", icon: FileText },
-  { to: "/master/disciplines", label: "Disciplines", icon: Wrench },
-  { to: "/master/users", label: "Users", icon: Users },
+const productionSidebar: SidebarGroup[] = [
+  {
+    label: "Production",
+    items: [
+      { to: "/production", label: "Production List", icon: LayoutDashboard },
+    ],
+  },
 ]
 
-function getActiveModule(pathname: string): { module: ModuleId; sidebar: SidebarItem[] } {
-  if (pathname.startsWith("/master")) return { module: "master", sidebar: masterSidebar }
-  if (pathname.startsWith("/production")) return { module: "production", sidebar: productionSidebar }
-  return { module: "drawing", sidebar: drawingSidebar }
+const masterSidebar: SidebarGroup[] = [
+  {
+    label: "Organization",
+    icon: Building2,
+    items: [
+      { to: "/master/companies", label: "Companies", icon: Building2 },
+      { to: "/master/projects", label: "Projects", icon: FolderKanban },
+    ],
+  },
+  {
+    label: "Reference",
+    icon: Wrench,
+    items: [
+      { to: "/master/modules", label: "Modules", icon: LayoutDashboard },
+      { to: "/master/drawing-types", label: "Drawing Types", icon: FileText },
+      { to: "/master/disciplines", label: "Disciplines", icon: Wrench },
+    ],
+  },
+  {
+    label: "Access",
+    icon: Users,
+    items: [
+      { to: "/master/users", label: "Users", icon: Users },
+    ],
+  },
+]
+
+function getActiveModule(pathname: string): { module: ModuleId; groups: SidebarGroup[] } {
+  if (pathname === "/") return { module: "dashboard", groups: dashboardSidebar }
+  if (pathname.startsWith("/master")) return { module: "master", groups: masterSidebar }
+  if (pathname.startsWith("/production")) return { module: "production", groups: productionSidebar }
+  return { module: "drawing", groups: drawingSidebar }
+}
+
+function groupContainsPath(groups: SidebarGroup[], pathname: string): boolean {
+  return groups.some((g) => g.items.some((item) => item.to === pathname))
 }
 
 export function AppLayout() {
   const { user, logout, isLoading } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
-  const { module: activeModule, sidebar } = getActiveModule(location.pathname)
+  const { module: activeModule, groups } = getActiveModule(location.pathname)
+
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {}
+    for (const g of groups) {
+      initial[g.label] = g.items.some((item) => item.to === location.pathname)
+    }
+    return initial
+  })
+
+  const toggleGroup = (label: string) => {
+    setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }))
+  }
+
+  const isGroupExpanded = (g: SidebarGroup): boolean => {
+    if (g.label in expandedGroups) return expandedGroups[g.label]
+    return g.items.some((item) => item.to === location.pathname)
+  }
 
   if (isLoading) {
     return (
@@ -140,25 +214,44 @@ export function AppLayout() {
             </h2>
           </div>
 
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            {sidebar.map((item) => {
-              const Icon = item.icon
-              const isActive = location.pathname === item.to
+          <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-1">
+            {groups.map((group) => {
+              const expanded = isGroupExpanded(group)
               return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 font-mono font-bold text-xs uppercase border-2 transition-all",
-                    isActive
-                      ? "bg-green-600 text-white border-green-600"
-                      : "text-gray-700 border-transparent hover:border-gray-300 hover:bg-gray-100",
+                <div key={group.label}>
+                  <button
+                    onClick={() => toggleGroup(group.label)}
+                    className="w-full flex items-center gap-3 px-4 py-3 font-mono font-bold text-xs uppercase border-2 border-transparent hover:border-gray-300 hover:bg-gray-100 transition-all text-gray-500"
+                  >
+                    {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    {group.label}
+                  </button>
+
+                  {expanded && (
+                    <div className="ml-2 mt-0.5 space-y-0.5">
+                      {group.items.map((item) => {
+                        const Icon = item.icon
+                        const isActive = location.pathname === item.to
+                        return (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            className={cn(
+                              "flex items-center gap-3 px-4 py-2.5 font-mono font-bold text-xs uppercase border-2 transition-all",
+                              isActive
+                                ? "bg-green-600 text-white border-green-600"
+                                : "text-gray-700 border-transparent hover:border-gray-300 hover:bg-gray-100",
+                            )}
+                          >
+                            <Icon size={15} />
+                            {item.label}
+                            {isActive && <ChevronRight size={13} className="ml-auto" />}
+                          </Link>
+                        )
+                      })}
+                    </div>
                   )}
-                >
-                  <Icon size={16} />
-                  {item.label}
-                  {isActive && <ChevronRight size={14} className="ml-auto" />}
-                </Link>
+                </div>
               )
             })}
           </nav>

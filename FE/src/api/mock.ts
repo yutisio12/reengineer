@@ -166,7 +166,7 @@ export const mockDrawings: Drawing[] = [
     document_no: "INS-OPA-001",
     created_by: "u1",
     assigned_drafter: "u2",
-    status: "fully_approved",
+    status: "transmitted",
     description: "DCS architecture and IO schedule",
     created_at: "2026-05-25T08:00:00Z",
     updated_at: "2026-05-30T17:00:00Z",

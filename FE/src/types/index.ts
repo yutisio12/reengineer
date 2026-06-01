@@ -145,4 +145,4 @@ export type UpdateProjectPayload = Partial<Pick<Project, "name" | "code" | "comp
 export type UpdateDrawingTypePayload = Partial<Pick<DrawingType, "name" | "code">>
 export type UpdateDisciplinePayload = Partial<Pick<Discipline, "name" | "code">>
 export type UpdateUserPayload = Partial<Pick<User, "name" | "email" | "role" | "is_active">>
-export type UpdateDrawingPayload = Partial<Pick<Drawing, "company_id" | "project_id" | "discipline_id" | "drawing_type_id" | "module_id" | "document_no" | "assigned_drafter" | "description">>
+export type UpdateDrawingPayload = Partial<Pick<Drawing, "company_id" | "project_id" | "discipline_id" | "drawing_type_id" | "module_id" | "document_no" | "assigned_drafter" | "description" | "status">>

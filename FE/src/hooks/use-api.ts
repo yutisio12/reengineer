@@ -5,8 +5,12 @@ import {
   createDrawing,
   updateDrawing,
   fetchTransmittableDrawings,
+  fetchProductionDrawings,
+  raiseRevision,
   type DrawingFilters,
   type CreateDrawingPayload,
+  type ProductionFilters,
+  type RaiseRevisionPayload,
 } from "../api/drawings"
 import {
   fetchActivities,
@@ -292,6 +296,28 @@ export function useTransmit() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["drawings"] })
       qc.invalidateQueries({ queryKey: ["drawings", "transmittable"] })
+    },
+  })
+}
+
+export function useProductionDrawings(filters: ProductionFilters) {
+  return useQuery({
+    queryKey: ["production", "drawings", filters],
+    queryFn: () => fetchProductionDrawings(filters),
+  })
+}
+
+export function useRaiseRevision(drawingId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: RaiseRevisionPayload) =>
+      raiseRevision(drawingId, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["production", "drawings"] })
+      qc.invalidateQueries({ queryKey: ["drawing", drawingId] })
+      qc.invalidateQueries({ queryKey: ["drawings"] })
+      qc.invalidateQueries({ queryKey: ["revisions", drawingId] })
+      qc.invalidateQueries({ queryKey: ["activities", drawingId] })
     },
   })
 }

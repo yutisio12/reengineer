@@ -15,6 +15,7 @@ import { MasterDrawingTypesPage } from "../pages/master-drawing-types"
 import { MasterDisciplinesPage } from "../pages/master-disciplines"
 import { MasterUsersPage } from "../pages/master-users"
 import ProductionPage from "../pages/production"
+import DashboardPage from "../pages/dashboard"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,7 @@ export function AppRouter() {
             </Route>
 
             <Route element={<AppLayout />}>
+              <Route path="/" element={<DashboardPage />} />
               <Route path="/drawings" element={<DrawingListPage />} />
               <Route path="/drawings/create" element={<DrawingCreatePage />} />
               <Route path="/drawings/:id" element={<DrawingDetailPage />} />

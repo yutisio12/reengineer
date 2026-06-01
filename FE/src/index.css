@@ -21,3 +21,129 @@ html, body, #root {
   margin: 0;
   padding: 0;
 }
+
+:root {
+  --color-text-primary: #000;
+  --color-text-secondary: #666;
+  --color-surface: #fff;
+  --color-border: #000;
+}
+
+
+/* ── SweetAlert2 Neobrutalism ── */
+.swal2-popup.swal-neo {
+  border: 4px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow: 8px 8px 0 0 #000 !important;
+  font-family: ui-monospace, Consolas, monospace !important;
+  padding: 2rem !important;
+}
+
+.swal2-popup.swal-neo .swal2-title {
+  font-size: 0.875rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0 !important;
+  margin-bottom: 0.75rem !important;
+  color: #000 !important;
+}
+
+.swal2-popup.swal-neo .swal2-html-container {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #666 !important;
+  margin-bottom: 1rem !important;
+  padding: 0 !important;
+}
+
+.swal2-popup.swal-neo .swal2-actions {
+  margin-top: 1rem !important;
+}
+
+.swal2-popup.swal-neo .swal2-confirm {
+  border: 4px solid #000 !important;
+  border-radius: 0 !important;
+  font-family: ui-monospace, Consolas, monospace !important;
+  font-size: 0.75rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  padding: 0.625rem 1.5rem !important;
+  box-shadow: 4px 4px 0 0 #000 !important;
+  transition: all 0.1s ease !important;
+}
+
+.swal2-popup.swal-neo .swal2-confirm:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0 0 #000 !important;
+}
+
+.swal2-popup.swal-neo .swal2-cancel {
+  border: 4px solid #000 !important;
+  border-radius: 0 !important;
+  font-family: ui-monospace, Consolas, monospace !important;
+  font-size: 0.75rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  padding: 0.625rem 1.5rem !important;
+  box-shadow: 4px 4px 0 0 #000 !important;
+  transition: all 0.1s ease !important;
+}
+
+.swal2-popup.swal-neo .swal2-cancel:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0 0 #000 !important;
+}
+
+.swal2-popup.swal-neo .swal2-confirm--green {
+  background: #16A34A !important;
+  color: #fff !important;
+}
+
+.swal2-popup.swal-neo .swal2-cancel--black {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+.swal2-popup.swal-neo .swal2-timer-progress-bar {
+  height: 6px !important;
+  border-bottom: 4px solid #000 !important;
+  background: #000 !important;
+}
+
+/* Toast variant */
+.swal2-popup.swal-neo.swal2-toast {
+  border: 4px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow: 6px 6px 0 0 #000 !important;
+  font-family: ui-monospace, Consolas, monospace !important;
+  padding: 0.875rem 1.25rem !important;
+  margin-top: 4rem !important;
+}
+
+.swal2-popup.swal-neo.swal2-toast .swal2-title {
+  font-size: 0.7rem !important;
+  margin-bottom: 0 !important;
+}
+
+.swal2-popup.swal-neo.swal2-toast .swal2-timer-progress-bar {
+  height: 4px !important;
+  border-bottom: 3px solid #000 !important;
+}
+
+/* Toast icons */
+.swal2-popup.swal-neo .swal2-icon {
+  border: none !important;
+  font-size: 1rem !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0.5rem 0 0 !important;
+}
+
+.swal2-popup.swal-neo .swal2-success-ring {
+  display: none !important;
+}
+
+.swal2-popup.swal-neo .swal2-icon-content {
+  font-size: 1.25rem !important;
+}
