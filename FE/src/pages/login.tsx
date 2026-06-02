@@ -52,7 +52,7 @@ function BlueprintLinesSVG({ className }: { className?: string }) {
       <rect x="160" y="140" width="100" height="30" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" fill="none" />
       <line x1="50" y1="170" x2="50" y2="190" stroke="currentColor" strokeWidth="1" />
       <line x1="80" y1="170" x2="80" y2="190" stroke="currentColor" strokeWidth="1" />
-      <text x="55" y="185" fontSize="8" fill="currentColor" fontFamily="monospace">A</text>
+      <text x="55" y="185" fontSize="8" fill="currentColor" fontFamily="monospace">C</text>
       <text x="85" y="185" fontSize="8" fill="currentColor" fontFamily="monospace">B</text>
       <line x1="40" y1="30" x2="100" y2="30" stroke="currentColor" strokeWidth="1" />
       <text x="42" y="28" fontSize="8" fill="currentColor" fontFamily="monospace">50mm</text>
