@@ -1,0 +1,12 @@
+{
+  "name": "engineering-tracker",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n BE,FE -c blue,green \"npm run dev:be\" \"npm run dev:fe\"",
+    "dev:be": "npm --prefix BE run start:dev",
+    "dev:fe": "npm --prefix FE run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
