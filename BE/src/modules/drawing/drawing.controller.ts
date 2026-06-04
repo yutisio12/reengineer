@@ -18,10 +18,13 @@ import { UpdateDrawingDto } from './dto/update-drawing.dto';
 import { DrawingActionDto } from './dto/drawing-action.dto';
 import { CreateRevisionDto } from './dto/create-revision.dto';
 import { QueryDrawingDto } from './dto/query-drawing.dto';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT')
+@ApiTags('Drawings')
 @Controller('engineering/api')
 export class DrawingController {
   constructor(
@@ -30,31 +33,37 @@ export class DrawingController {
     private fileRepo: Repository<RevisionFile>,
   ) {}
 
+  @ApiOperation({ summary: 'Get all drawings with optional filters' })
   @Get('drawings')
   findAll(@Query() query: QueryDrawingDto) {
     return this.drawingService.findAll(query);
   }
 
+  @ApiOperation({ summary: 'Get a drawing by ID' })
   @Get('drawings/:id')
   findOne(@Param('id') id: string) {
     return this.drawingService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Create a new drawing' })
   @Post('drawings')
   create(@Body() dto: CreateDrawingDto, @CurrentUser() user: User) {
     return this.drawingService.create(dto, user.id);
   }
 
+  @ApiOperation({ summary: 'Update a drawing' })
   @Patch('drawings/:id')
   update(@Param('id') id: string, @Body() dto: UpdateDrawingDto) {
     return this.drawingService.update(id, dto);
   }
 
+  @ApiOperation({ summary: 'Get activities for a drawing' })
   @Get('drawings/:id/activities')
   getActivities(@Param('id') id: string) {
     return this.drawingService.getActivities(id);
   }
 
+  @ApiOperation({ summary: 'Perform an action on a drawing (submit, review, approve, reject, revise)' })
   @Post('drawings/:id/actions')
   performAction(
     @Param('id') id: string,
@@ -64,11 +73,13 @@ export class DrawingController {
     return this.drawingService.performAction(id, dto, user.id);
   }
 
+  @ApiOperation({ summary: 'Get revisions for a drawing' })
   @Get('drawings/:id/revisions')
   getRevisions(@Param('id') id: string) {
     return this.drawingService.getRevisions(id);
   }
 
+  @ApiOperation({ summary: 'Create a new revision for a drawing' })
   @Post('drawings/:id/revisions')
   createRevision(
     @Param('id') id: string,
@@ -78,6 +89,7 @@ export class DrawingController {
     return this.drawingService.createRevision(id, dto, user.id);
   }
 
+  @ApiOperation({ summary: 'Upload a file to a revision' })
   @Post('revisions/:revisionId/files')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -110,6 +122,7 @@ export class DrawingController {
     return this.fileRepo.save(savedFile);
   }
 
+  @ApiOperation({ summary: 'Download a file from a revision' })
   @Get('revisions/files/:fileId/download')
   async downloadFile(@Param('fileId') fileId: string, @Res() res: Response) {
     const file = await this.drawingService.getFile(fileId);
