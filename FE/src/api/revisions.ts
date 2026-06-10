@@ -81,6 +81,5 @@ export async function getFileDownloadUrl(fileId: string): Promise<string> {
   if (isDevMode()) {
     return createMockResponse(`/files/mock-${fileId}.pdf`)
   }
-  const file = await apiClient<{ url: string }>(`/revisions/files/${fileId}`)
-  return file.url
+  return `/engineering/api/revisions/files/${fileId}/download`
 }
