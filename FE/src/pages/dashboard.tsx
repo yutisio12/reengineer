@@ -1,21 +1,14 @@
 import { useEffect, useRef, useState, useMemo } from "react"
-import { enrichDrawings } from "../api/mock"
-import { mockUsers, mockDisciplines, mockProjects, mockModules } from "../api/mock"
+import {
+  useDrawings, useProjects, useModules,
+  useDisciplines, useUsers,
+} from "../hooks/use-api"
 
 const STATUS_GROUP: Record<string, { label: string; color: string }> = {
   draft: { label: "Assigned / Draft", color: "#EAB308" },
   onProgress: { label: "In Progress", color: "#3B82F6" },
   ifr: { label: "IFR / Review", color: "#F97316" },
   ifc: { label: "IFC / Complete", color: "#22C55E" },
-}
-
-const DISCIPLINE_MAP: Record<string, string> = {
-  d1: "Mekanikal",
-  d2: "Elektrikal",
-  d3: "Struktur",
-  d4: "Process",
-  d5: "Piping",
-  d6: "Instrumentasi",
 }
 
 function getGroup(status: string): string {
@@ -29,18 +22,25 @@ export default function DashboardPage() {
   const [disciplineFilter, setDisciplineFilter] = useState("")
   const [periodFilter, setPeriodFilter] = useState("all")
 
-  const drawings = useMemo(() => enrichDrawings(), [])
+  const { data: paginated } = useDrawings({ per_page: 1000, page: 1 })
+  const { data: users } = useUsers()
+  const { data: disciplines } = useDisciplines()
+  const { data: projects } = useProjects()
+  const { data: modules } = useModules()
+
+  const drawings = useMemo(() => paginated?.data ?? [], [paginated])
 
   const filteredDrawings = useMemo(() => {
     let d = drawings
     if (disciplineFilter) d = d.filter((dw) => dw.discipline_id === disciplineFilter)
-
     if (periodFilter === "month") {
-      const start = new Date("2026-05-01T00:00:00Z").getTime()
-      d = d.filter((dw) => new Date(dw.created_at).getTime() >= start)
+      const start = new Date()
+      start.setDate(1); start.setHours(0,0,0,0)
+      d = d.filter((dw) => new Date(dw.created_at).getTime() >= start.getTime())
     } else if (periodFilter === "3months") {
-      const start = new Date("2026-03-01T00:00:00Z").getTime()
-      d = d.filter((dw) => new Date(dw.created_at).getTime() >= start)
+      const start = new Date()
+      start.setMonth(start.getMonth() - 3); start.setDate(1); start.setHours(0,0,0,0)
+      d = d.filter((dw) => new Date(dw.created_at).getTime() >= start.getTime())
     }
     return d
   }, [drawings, disciplineFilter, periodFilter])
@@ -52,8 +52,9 @@ export default function DashboardPage() {
     const ifrCount = filteredDrawings.filter((d) => getGroup(d.status) === "ifr").length
     const draft = filteredDrawings.filter((d) => getGroup(d.status) === "draft").length
 
-    const lastMonthStart = new Date("2026-05-01T00:00:00Z").getTime()
-    const addedThisMonth = filteredDrawings.filter((d) => new Date(d.created_at).getTime() >= lastMonthStart).length
+    const now = new Date()
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime()
+    const addedThisMonth = filteredDrawings.filter((d) => new Date(d.created_at).getTime() >= monthStart).length
 
     const overallPct = total > 0 ? Math.round((ifc / total) * 100) : 0
 
@@ -70,66 +71,54 @@ export default function DashboardPage() {
   }, [metrics])
 
   const progressPerDiscipline = useMemo(() => {
-    const labels = ["Mekanikal", "Piping", "Struktur", "Elektrikal"]
-    const discIds = Object.entries(DISCIPLINE_MAP).filter(([, v]) => labels.includes(v)).map(([k]) => k)
-
+    const discList = disciplines ?? []
+    const labels: string[] = []
     const selesai: number[] = []
     const sisa: number[] = []
 
-    for (const did of discIds) {
-      const total = filteredDrawings.filter((d) => d.discipline_id === did).length
-      const done = filteredDrawings.filter((d) => d.discipline_id === did && getGroup(d.status) === "ifc").length
+    for (const disc of discList) {
+      const total = filteredDrawings.filter((d) => d.discipline_id === disc.id).length
+      if (total === 0) continue
+      const done = filteredDrawings.filter((d) => d.discipline_id === disc.id && getGroup(d.status) === "ifc").length
+      labels.push(disc.name)
       selesai.push(done)
       sisa.push(total - done)
     }
 
     return { labels, selesai, sisa }
-  }, [filteredDrawings])
+  }, [filteredDrawings, disciplines])
 
   const trendData = useMemo(() => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "Mei"]
-    const monthStarts = [
-      new Date("2026-01-01T00:00:00Z").getTime(),
-      new Date("2026-02-01T00:00:00Z").getTime(),
-      new Date("2026-03-01T00:00:00Z").getTime(),
-      new Date("2026-04-01T00:00:00Z").getTime(),
-      new Date("2026-05-01T00:00:00Z").getTime(),
-    ]
-    const monthEnds = [
-      new Date("2026-02-01T00:00:00Z").getTime(),
-      new Date("2026-03-01T00:00:00Z").getTime(),
-      new Date("2026-04-01T00:00:00Z").getTime(),
-      new Date("2026-05-01T00:00:00Z").getTime(),
-      new Date("2026-06-01T00:00:00Z").getTime(),
-    ]
-
+    const months: string[] = []
     const baru: number[] = []
     const selesai: number[] = []
 
-    for (let i = 0; i < months.length; i++) {
-      const start = monthStarts[i]
-      const end = monthEnds[i]
+    for (let i = 4; i >= 0; i--) {
+      const d = new Date()
+      d.setMonth(d.getMonth() - i)
+      months.push(d.toLocaleDateString("id", { month: "short" }))
+      const start = new Date(d.getFullYear(), d.getMonth(), 1).getTime()
+      const end = new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime()
 
-      const createdThisMonth = drawings.filter((d) => {
-        const t = new Date(d.created_at).getTime()
+      baru.push(drawings.filter((dw) => {
+        const t = new Date(dw.created_at).getTime()
         return t >= start && t < end
-      }).length
+      }).length)
 
-      const completedThisMonth = drawings.filter((d) => {
-        if (d.status !== "fully_approved" && d.status !== "transmitted") return false
-        const t = new Date(d.updated_at).getTime()
+      selesai.push(drawings.filter((dw) => {
+        if (dw.status !== "fully_approved" && dw.status !== "transmitted") return false
+        const t = new Date(dw.updated_at).getTime()
         return t >= start && t < end
-      }).length
-
-      baru.push(createdThisMonth)
-      selesai.push(completedThisMonth)
+      }).length)
     }
 
     return { months, baru, selesai }
   }, [drawings])
 
   const engineerWorkload = useMemo(() => {
-    const engineers = mockUsers.filter((u) => u.role === "drafter" || u.role === "checker" || u.role === "engineer").slice(0, 5)
+    const engineers = (users ?? [])
+      .filter((u) => u.role === "drafter" || u.role === "checker" || u.role === "engineer")
+      .slice(0, 5)
     return engineers.map((eng) => {
       const assigned = drawings.filter((d) => d.assigned_drafter === eng.id).length
       const done = drawings.filter((d) => d.assigned_drafter === eng.id && (d.status === "fully_approved" || d.status === "transmitted")).length
@@ -142,10 +131,10 @@ export default function DashboardPage() {
       }
       return { ...eng, assigned, done, pct, initial, barColor: colorMap[eng.role] || "#3B82F6" }
     })
-  }, [drawings])
+  }, [drawings, users])
 
-  const firstProject = mockProjects[0]
-  const firstModule = mockModules.find((m) => m.project_id === firstProject.id)
+  const firstProject = projects?.[0]
+  const firstModule = modules?.find((m) => m.project_id === firstProject?.id)
 
   return (
     <div className="space-y-6">
@@ -155,7 +144,7 @@ export default function DashboardPage() {
             Dashboard
           </h1>
           <p className="font-mono text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
-            {firstProject.name} / {firstModule?.name || "-"}
+            {firstProject?.name ?? "-"} / {firstModule?.name ?? "-"}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -166,7 +155,7 @@ export default function DashboardPage() {
             style={{ color: "var(--color-text-primary)", background: "var(--color-surface)" }}
           >
             <option value="">Semua Disiplin</option>
-            {mockDisciplines.map((d) => (
+            {(disciplines ?? []).map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
             ))}
           </select>

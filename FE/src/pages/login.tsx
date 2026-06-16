@@ -1,4 +1,4 @@
-import { useState, type FormEvent, useEffect, useRef } from "react"
+import { useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../providers/auth-provider"
 import { isDevMode } from "../api/client"
@@ -84,8 +84,8 @@ function CrosshairSVG({ className }: { className?: string }) {
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState("admin@company.com")
-  const [password, setPassword] = useState("password")
+  const [email, setEmail] = useState("admin@example.com")
+  const [password, setPassword] = useState("admin123")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -106,7 +106,7 @@ export default function LoginPage() {
   const handleGuest = async () => {
     setLoading(true)
     try {
-      await login("admin@company.com", "password")
+      await login("admin@example.com", "admin123")
       navigate("/drawings", { replace: true })
     } catch {
       setError("Guest login failed.")

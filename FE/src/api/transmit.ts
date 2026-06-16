@@ -12,7 +12,7 @@ export async function transmitDrawings(
         drawing_id: id,
         transmitted_by: "u1",
         transmitted_at: new Date().toISOString(),
-        notes: notes || null,
+        ...(notes ? { notes } : {}),
       })),
     )
   }

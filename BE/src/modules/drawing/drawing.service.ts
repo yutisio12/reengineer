@@ -70,7 +70,10 @@ export class DrawingService {
 
     return {
       data,
-      meta: { total, page, per_page, total_pages: Math.ceil(total / per_page) },
+      total,
+      page,
+      per_page,
+      total_pages: Math.ceil(total / per_page),
     };
   }
 

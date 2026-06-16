@@ -12,7 +12,7 @@ export default function TransmitPage() {
   const transmitMutation = useTransmit()
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [notes, setNotes] = useState("")
-  const [showConfirm, setShowConfirm] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -46,7 +46,7 @@ export default function TransmitPage() {
       showToast("success", "Transmitted successfully")
       setSelectedIds(new Set())
       setNotes("")
-      setShowConfirm(false)
+      setShowConfirmModal(false)
       navigate("/drawings")
     } catch {
       showToast("error", "Transmit failed")
@@ -170,7 +170,7 @@ export default function TransmitPage() {
           </div>
 
           <button
-            onClick={() => setShowConfirm(true)}
+            onClick={() => setShowConfirmModal(true)}
             className="flex items-center gap-2 bg-green-600 text-white font-mono font-bold text-sm uppercase px-8 py-4 border-4 border-black hover:bg-green-700 transition-all"
           >
             <Send size={18} />
@@ -180,7 +180,7 @@ export default function TransmitPage() {
         </div>
       )}
 
-      {showConfirm && (
+      {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="border-4 border-black bg-white p-6 w-full max-w-md">
             <h3 className="font-mono font-bold text-sm uppercase mb-2">
@@ -201,7 +201,7 @@ export default function TransmitPage() {
                   : "CONFIRM TRANSMIT"}
               </button>
               <button
-                onClick={() => setShowConfirm(false)}
+                onClick={() => setShowConfirmModal(false)}
                 className="bg-white text-black font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-black hover:text-white transition-all"
               >
                 CANCEL

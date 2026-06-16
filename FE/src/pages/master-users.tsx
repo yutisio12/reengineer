@@ -4,7 +4,8 @@ import { cn } from "../lib/utils"
 import { showConfirm, showToast } from "../lib/swal"
 import { Pencil, X, Plus } from "lucide-react"
 import { ROLES } from "../lib/constants"
-import type { User, UserRole } from "../lib/constants"
+import type { UserRole } from "../lib/constants"
+import type { User } from "../types"
 
 function EditModal({ item, onClose }: { item: User; onClose: () => void }) {
   const [name, setName] = useState(item.name)

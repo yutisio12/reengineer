@@ -11,7 +11,7 @@ import {
 import type { DrawingFilters } from "../api/drawings"
 import { STATUS_LABEL, STATUS_COLOR } from "../lib/constants"
 import { cn, formatDate } from "../lib/utils"
-import { Search, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 
 export default function DrawingListPage() {
   const navigate = useNavigate()

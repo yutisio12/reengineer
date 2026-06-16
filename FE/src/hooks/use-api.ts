@@ -42,14 +42,16 @@ import {
   createDrawingType,
   createDiscipline,
   createUser,
-  type UpdateCompanyPayload,
-  type UpdateProjectPayload,
-  type UpdateModulePayload,
-  type UpdateDrawingTypePayload,
-  type UpdateDisciplinePayload,
-  type UpdateUserPayload,
 } from "../api/master-data"
-import type { UpdateDrawingPayload } from "../api/drawings"
+import type {
+  UpdateCompanyPayload,
+  UpdateProjectPayload,
+  UpdateModulePayload,
+  UpdateDrawingTypePayload,
+  UpdateDisciplinePayload,
+  UpdateUserPayload,
+  UpdateDrawingPayload,
+} from "../types"
 import type { UserRole } from "../lib/constants"
 import { getMe } from "../api/auth"
 

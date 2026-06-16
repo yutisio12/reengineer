@@ -5,6 +5,8 @@ import type {
   DrawingType,
   Discipline,
   User,
+} from "../types"
+import type {
   UpdateCompanyPayload,
   UpdateProjectPayload,
   UpdateModulePayload,
@@ -13,7 +15,7 @@ import type {
   UpdateUserPayload,
 } from "../types"
 import { apiClient, createMockResponse, isDevMode } from "./client"
-import { mockCompanies, mockProjects, mockModules, mockDrawingTypes, mockDisciplines, mockUsers, mockRevisions } from "./mock"
+import { mockCompanies, mockProjects, mockModules, mockDrawingTypes, mockDisciplines, mockUsers } from "./mock"
 
 export async function fetchCompanies(): Promise<Company[]> {
   if (isDevMode()) return createMockResponse(mockCompanies)

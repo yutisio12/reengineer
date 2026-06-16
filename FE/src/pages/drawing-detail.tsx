@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { useParams } from "react-router-dom"
 import {
   useDrawing,
@@ -19,7 +19,6 @@ import { cn, formatDate } from "../lib/utils"
 import { showConfirm, showToast } from "../lib/swal"
 import { Undo2, Play, Square, Check, Send, Upload, X, FileText, Pencil } from "lucide-react"
 import type { PerformActionPayload } from "../api/activities"
-import type { CreateRevisionPayload } from "../api/revisions"
 import { uploadFile } from "../api/revisions"
 
 type ActiveTab = "activity" | "revision"
@@ -528,7 +527,6 @@ function ActionButton({
 }
 
 function RevisionTab({ drawingId }: { drawingId: string }) {
-  const { data: drawing } = useDrawing(drawingId)
   const { data: revisions, isLoading } = useRevisions(drawingId)
   const createRevision = useCreateRevision(drawingId)
   const [showForm, setShowForm] = useState(false)
@@ -542,16 +540,13 @@ function RevisionTab({ drawingId }: { drawingId: string }) {
     if (!confirmed) return
     setUploading(true)
     try {
-      let fileIds: string[] = []
-      if (files.length > 0) {
-        fileIds = await uploadFile(files)
-      }
-      const payload: CreateRevisionPayload = {
+      const result = await createRevision.mutateAsync({
         revision_no: form.revision_no,
         description: form.description,
-        file_ids: fileIds,
+      })
+      for (const file of files) {
+        await uploadFile(result.id, file)
       }
-      await createRevision.mutateAsync(payload)
       showToast("success", "Revision created")
       setForm({ revision_no: "", description: "" })
       setFiles([])
@@ -568,7 +563,9 @@ function RevisionTab({ drawingId }: { drawingId: string }) {
     if (!confirmed) return
     setUploadingRevId(revId)
     try {
-      await uploadFile(Array.from(newFiles))
+      for (const file of Array.from(newFiles)) {
+        await uploadFile(revId, file)
+      }
       showToast("success", "Files uploaded")
     } catch {
       showToast("error", "Upload failed")

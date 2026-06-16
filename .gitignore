@@ -32,6 +32,8 @@ out/
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
 
 # npm cache directory
 .npm

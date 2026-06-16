@@ -8,7 +8,6 @@ import type {
   Drawing,
   DrawingActivity,
   DrawingRevision,
-  RevisionFile,
   PaginatedResponse,
 } from "../types"
 

@@ -1,6 +1,6 @@
 import type { Drawing, PaginatedResponse, UpdateDrawingPayload } from "../types"
 import { apiClient, createMockResponse, isDevMode } from "./client"
-import { enrichDrawings, mockDrawings, mockDrawingTypes, mockPaginatedDrawings, mockRevisions, mockActivities, mockUsers } from "./mock"
+import { enrichDrawings, mockDrawings, mockDrawingTypes, mockRevisions, mockActivities, mockUsers } from "./mock"
 
 export interface DrawingFilters {
   company_id?: string

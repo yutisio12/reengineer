@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback, useEffect } from "react"
-import { enrichDrawings } from "../api/mock"
-import { mockCompanies, mockProjects, mockModules } from "../api/mock"
-import { useRevisions, useRaiseRevision } from "../hooks/use-api"
+import {
+  useProductionDrawings, useCompanies, useProjects, useModules,
+  useRevisions, useRaiseRevision,
+} from "../hooks/use-api"
 import { showConfirm, showToast } from "../lib/swal"
 import { formatDate } from "../lib/utils"
 import * as XLSX from "xlsx"
@@ -14,8 +15,7 @@ import {
 } from "lucide-react"
 import { cn } from "../lib/utils"
 import { STATUS_COLOR } from "../lib/constants"
-
-type Drawing = ReturnType<typeof enrichDrawings>[number]
+import type { Drawing } from "../types"
 
 export default function ProductionPage() {
   const [companyFilter, setCompanyFilter] = useState("")
@@ -26,34 +26,23 @@ export default function ProductionPage() {
   const [detailDrawing, setDetailDrawing] = useState<Drawing | null>(null)
   const [reviseDrawing, setReviseDrawing] = useState<Drawing | null>(null)
 
-  const drawings = useMemo(() => {
-    return enrichDrawings().filter((d) => d.status === "transmitted")
-  }, [])
+  const { data: drawings } = useProductionDrawings({ company_id: companyFilter, project_id: projectFilter, module_id: moduleFilter })
 
-  const companies = useMemo(() => mockCompanies.filter((c) => c.is_active), [])
-  const projects = useMemo(
-    () => (companyFilter ? mockProjects.filter((p) => p.company_id === companyFilter && p.is_active) : []),
-    [companyFilter],
-  )
-  const filteredModules = useMemo(
-    () => (projectFilter ? mockModules.filter((m) => m.project_id === projectFilter && m.is_active) : []),
-    [projectFilter],
-  )
+  const { data: companies } = useCompanies()
+  const { data: projects } = useProjects(companyFilter)
+  const { data: filteredModules } = useModules(projectFilter)
 
   useEffect(() => { setProjectFilter(""); setModuleFilter("") }, [companyFilter])
   useEffect(() => { setModuleFilter("") }, [projectFilter])
 
   const filteredDrawings = useMemo(() => {
-    let d = drawings
-    if (companyFilter) d = d.filter((dw) => dw.company_id === companyFilter)
-    if (projectFilter) d = d.filter((dw) => dw.project_id === projectFilter)
-    if (moduleFilter) d = d.filter((dw) => dw.module_id === moduleFilter)
+    let d = drawings ?? []
     if (search.trim()) {
       const q = search.toLowerCase()
       d = d.filter((dw) => dw.document_no.toLowerCase().includes(q) || (dw.description || "").toLowerCase().includes(q))
     }
     return d
-  }, [drawings, companyFilter, projectFilter, moduleFilter, search])
+  }, [drawings, search])
 
   const handleExport = useCallback(() => {
     const data = filteredDrawings.map((d, i) => ({
@@ -111,8 +100,8 @@ export default function ProductionPage() {
           className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none focus:bg-yellow-50"
           style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
         >
-          <option value="">Semua Company</option>
-          {companies.map((c) => (
+           <option value="">Semua Company</option>
+          {(companies ?? []).map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
@@ -124,7 +113,7 @@ export default function ProductionPage() {
           style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
         >
           <option value="">Semua Project</option>
-          {projects.map((p) => (
+          {(projects ?? []).map((p) => (
             <option key={p.id} value={p.id}>{p.name}</option>
           ))}
         </select>
@@ -136,7 +125,7 @@ export default function ProductionPage() {
           style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
         >
           <option value="">Semua Module</option>
-          {filteredModules.map((m) => (
+          {(filteredModules ?? []).map((m) => (
             <option key={m.id} value={m.id}>{m.name}</option>
           ))}
         </select>

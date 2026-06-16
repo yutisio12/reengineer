@@ -112,10 +112,6 @@ function getActiveModule(pathname: string): { module: ModuleId; groups: SidebarG
   return { module: "drawing", groups: drawingSidebar }
 }
 
-function groupContainsPath(groups: SidebarGroup[], pathname: string): boolean {
-  return groups.some((g) => g.items.some((item) => item.to === pathname))
-}
-
 export function AppLayout() {
   const { user, logout, isLoading } = useAuth()
   const location = useLocation()

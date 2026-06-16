@@ -11,7 +11,10 @@ import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`, '.env'],
+    }),
     TypeOrmModule.forRoot(databaseConfig),
     AuthModule,
     MasterModule,
