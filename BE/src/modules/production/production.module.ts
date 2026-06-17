@@ -1,5 +1,6 @@
 import { Module as NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from '../auth/auth.module';
 import { ProductionController } from './production.controller';
 import { ProductionService } from './production.service';
 import { Drawing } from '../../entities/drawing.entity';
@@ -9,6 +10,7 @@ import { DrawingActivity } from '../../entities/drawing-activity.entity';
 @NestModule({
   imports: [
     TypeOrmModule.forFeature([Drawing, DrawingRevision, DrawingActivity]),
+    AuthModule,
   ],
   controllers: [ProductionController],
   providers: [ProductionService],

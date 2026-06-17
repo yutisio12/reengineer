@@ -1,3 +1,5 @@
+let isHandling401 = false
+
 const BASE_URL = "/engineering/api"
 
 export class ApiError extends Error {
@@ -45,16 +47,23 @@ export async function apiClient<T>(
   options: RequestOptions = {},
 ): Promise<T> {
   const { params, ...fetchOptions } = options
+  const method = (fetchOptions.method || "GET").toUpperCase()
   const token = getToken()
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     Accept: "application/json",
     ...(options.headers as Record<string, string>),
   }
 
   if (token) {
+    console.log(`[apiClient] ${method} ${url} - Bearer ${token.substring(0, 20)}...`)
     headers["Authorization"] = `Bearer ${token}`
+  } else {
+    console.log(`[apiClient] ${method} ${url} - no token`)
+  }
+
+  if (method !== "GET" && method !== "HEAD") {
+    headers["Content-Type"] = "application/json"
   }
 
   let url = `${BASE_URL}${endpoint}`
@@ -75,9 +84,21 @@ export async function apiClient<T>(
   })
 
   if (res.status === 401) {
-    clearToken()
-    window.location.href = "/login"
+    if (!isHandling401) {
+      isHandling401 = true
+      clearToken()
+      localStorage.removeItem("user")
+      window.dispatchEvent(new Event("auth:logout"))
+      setTimeout(() => { isHandling401 = false }, 2000)
+    }
     throw new ApiError(401, "Unauthorized")
+  }
+
+  if (res.status === 403) {
+    clearToken()
+    localStorage.removeItem("user")
+    window.dispatchEvent(new Event("auth:logout"))
+    throw new ApiError(403, "Forbidden")
   }
 
   if (!res.ok) {

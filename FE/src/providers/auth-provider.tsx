@@ -8,7 +8,7 @@ import {
 } from "react"
 import type { User } from "../types"
 import { login as loginApi, getMe } from "../api/auth"
-import { setToken, clearToken, isAuthenticated } from "../api/client"
+import { setToken, clearToken, isAuthenticated, ApiError } from "../api/client"
 
 interface AuthContextValue {
   user: User | null
@@ -20,31 +20,75 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const stored = localStorage.getItem("user")
+      return stored ? (JSON.parse(stored) as User) : null
+    } catch {
+      return null
+    }
+  })
+  const [isLoading, setIsLoading] = useState(!user && isAuthenticated())
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      getMe()
-        .then(setUser)
-        .catch(() => clearToken())
-        .finally(() => setIsLoading(false))
-    } else {
-      setIsLoading(false)
+    const handleForceLogout = () => {
+      setUser(null)
     }
+    window.addEventListener("auth:logout", handleForceLogout)
+    return () => window.removeEventListener("auth:logout", handleForceLogout)
+  }, [])
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      setIsLoading(false)
+      return
+    }
+    if (user) {
+      setIsLoading(false)
+      return
+    }
+    getMe()
+      .then((u) => {
+        setUser(u)
+        localStorage.setItem("user", JSON.stringify(u))
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 401) {
+          clearToken()
+          localStorage.removeItem("user")
+        }
+      })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await loginApi({ email, password })
+      console.log(`[auth] login response token:`, res.token ? `${res.token.substring(0, 20)}...` : 'UNDEFINED')
       setToken(res.token)
+      localStorage.setItem("user", JSON.stringify(res.user))
       setUser(res.user)
+      try {
+        const profile = await getMe()
+        console.log(`[auth] getMe succeeded`, profile)
+        localStorage.setItem("user", JSON.stringify(profile))
+        setUser(profile)
+      } catch {
+        console.log(`[auth] getMe failed - isAuthenticated:`, isAuthenticated())
+        if (isAuthenticated()) {
+          clearToken()
+          localStorage.removeItem("user")
+          setUser(null)
+        }
+        throw new Error("Token verification failed")
+      }
     },
     [],
   )
 
   const logout = useCallback(() => {
     clearToken()
+    localStorage.removeItem("user")
     setUser(null)
   }, [])
 

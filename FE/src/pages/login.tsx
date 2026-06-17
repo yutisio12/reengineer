@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../providers/auth-provider"
-import { isDevMode } from "../api/client"
+
 
 function GridSVG() {
   return (
@@ -186,26 +186,21 @@ export default function LoginPage() {
               {loading ? "AUTHENTICATING..." : "LOGIN →"}
             </button>
 
-            {isDevMode() && (
-              <div className="pt-2">
-                <div className="border-t-4 border-gray-200 pt-4">
-                  <p className="font-mono text-xs text-gray-400 uppercase mb-2 tracking-wider">
-                    Development Mode
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleGuest}
-                    disabled={loading}
-                    className="w-full bg-yellow-500 text-black font-mono font-bold text-sm uppercase px-6 py-3 border-4 border-black hover:bg-yellow-400 disabled:opacity-50 transition-all"
-                  >
-                    ⚡ Guest Access
-                  </button>
-                  <p className="font-mono text-[10px] text-gray-400 mt-2">
-                    Pre-filled credentials available. Click Guest for instant access.
-                  </p>
-                </div>
-              </div>
-            )}
+<div className="pt-2">
+  <div className="border-t-4 border-gray-200 pt-4">
+    <button
+      type="button"
+      onClick={handleGuest}
+      disabled={loading}
+      className="w-full bg-yellow-500 ..."
+    >
+      ⚡ Guest Access
+    </button>
+    <p className="font-mono text-[10px] text-gray-400 mt-2">
+      Pre-filled credentials available. Click Guest for instant access.
+    </p>
+  </div>
+</div>
           </form>
         </div>
       </div>
