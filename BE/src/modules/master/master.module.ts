@@ -1,5 +1,6 @@
 import { Module as NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from '../auth/auth.module';
 import { MasterController } from './master.controller';
 import { MasterService } from './master.service';
 import { Company } from '../../entities/company.entity';
@@ -12,6 +13,7 @@ import { User } from '../../entities/user.entity';
 @NestModule({
   imports: [
     TypeOrmModule.forFeature([Company, Project, ModuleEntity, DrawingType, Discipline, User]),
+    AuthModule,
   ],
   controllers: [MasterController],
   providers: [MasterService],

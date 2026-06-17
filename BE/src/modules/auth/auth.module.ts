@@ -8,18 +8,20 @@ import { JwtStrategy } from './jwt.strategy';
 import { User } from '../../entities/user.entity';
 import { SeedModule } from '../../seed/seed.module';
 
+const JWT_SECRET = 'super-secret-key-engineering-tracker-2026';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'super-secret-key-engineering-tracker-2026',
+      secret: JWT_SECRET,
       signOptions: { expiresIn: '24h' },
     }),
     SeedModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtModule, PassportModule],
+  exports: [AuthService, JwtModule, PassportModule, JwtStrategy],
 })
 export class AuthModule {}
