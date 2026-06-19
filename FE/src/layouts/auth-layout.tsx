@@ -8,7 +8,7 @@ export function AuthLayout() {
     return (
       <div className="flex h-full items-center justify-center bg-white">
         <div className="border-4 border-black px-8 py-4 text-xl font-bold font-mono">
-          LOADING...
+          LOADING . . .
         </div>
       </div>
     )
