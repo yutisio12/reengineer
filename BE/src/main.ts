@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { SeedService } from './seed/seed.service';
@@ -24,7 +25,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  app.use('/api/docs', apiReference({ content: document }));
 
   const seedService = app.get(SeedService);
   await seedService.seed();
@@ -32,7 +33,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`Server running on http://localhost:${port}/engineering/api`);
-  console.log(`Swagger docs at http://localhost:${port}/api/docs`);
+  console.log(`Scalar API docs at http://localhost:${port}/api/docs`);
 }
 
 bootstrap();
