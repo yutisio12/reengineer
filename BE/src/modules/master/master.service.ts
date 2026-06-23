@@ -57,24 +57,32 @@ export class MasterService {
   }
 
   // Projects
-  async getProjects(company_id?: string): Promise<Project[]> {
+  async getProjects(company_id?: string) {
     const where = company_id ? { company_id } : {};
-    return this.projectRepo.find({
+    const projects = await this.projectRepo.find({
       where,
       relations: { company: true },
       order: { name: 'ASC' },
     });
+    return projects.map((p) => ({
+      ...p,
+      company_name: p.company?.name || null,
+      company: undefined,
+    }));
   }
 
-  async createProject(dto: CreateProjectDto): Promise<Project> {
+  async createProject(dto: CreateProjectDto) {
     const company = await this.companyRepo.findOne({ where: { id: dto.company_id } });
     if (!company) throw new NotFoundException('Company not found');
     const project = this.projectRepo.create({ id: uuidv4(), ...dto });
     const saved = await this.projectRepo.save(project);
-    return (await this.projectRepo.findOne({ where: { id: saved.id }, relations: { company: true } }))!;
+    return {
+      ...saved,
+      company_name: company.name,
+    };
   }
 
-  async updateProject(id: string, dto: UpdateProjectDto): Promise<Project> {
+  async updateProject(id: string, dto: UpdateProjectDto) {
     const project = await this.projectRepo.findOne({ where: { id } });
     if (!project) throw new NotFoundException('Project not found');
     if (dto.company_id) {
@@ -83,28 +91,41 @@ export class MasterService {
     }
     Object.assign(project, dto);
     await this.projectRepo.save(project);
-    return (await this.projectRepo.findOne({ where: { id }, relations: { company: true } }))!;
+    const updated = await this.projectRepo.findOne({ where: { id }, relations: { company: true } });
+    return {
+      ...updated,
+      company_name: updated?.company?.name || null,
+      company: undefined,
+    };
   }
 
   // Modules
-  async getModules(project_id?: string): Promise<ModuleEntity[]> {
+  async getModules(project_id?: string) {
     const where = project_id ? { project_id } : {};
-    return this.moduleRepo.find({
+    const modules = await this.moduleRepo.find({
       where,
       relations: { project: true },
       order: { name: 'ASC' },
     });
+    return modules.map((m) => ({
+      ...m,
+      project_name: m.project?.name || null,
+      project: undefined,
+    }));
   }
 
-  async createModule(dto: CreateModuleDto): Promise<ModuleEntity> {
+  async createModule(dto: CreateModuleDto) {
     const project = await this.projectRepo.findOne({ where: { id: dto.project_id } });
     if (!project) throw new NotFoundException('Project not found');
     const mod = this.moduleRepo.create({ id: uuidv4(), ...dto });
     const saved = await this.moduleRepo.save(mod);
-    return (await this.moduleRepo.findOne({ where: { id: saved.id }, relations: { project: true } }))!;
+    return {
+      ...saved,
+      project_name: project.name,
+    };
   }
 
-  async updateModule(id: string, dto: UpdateModuleDto): Promise<ModuleEntity> {
+  async updateModule(id: string, dto: UpdateModuleDto) {
     const mod = await this.moduleRepo.findOne({ where: { id } });
     if (!mod) throw new NotFoundException('Module not found');
     if (dto.project_id) {
@@ -113,7 +134,12 @@ export class MasterService {
     }
     Object.assign(mod, dto);
     await this.moduleRepo.save(mod);
-    return (await this.moduleRepo.findOne({ where: { id }, relations: { project: true } }))!;
+    const updated = await this.moduleRepo.findOne({ where: { id }, relations: { project: true } });
+    return {
+      ...updated,
+      project_name: updated?.project?.name || null,
+      project: undefined,
+    };
   }
 
   // Drawing Types

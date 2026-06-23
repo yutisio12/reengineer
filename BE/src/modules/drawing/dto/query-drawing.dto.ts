@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUUID, IsInt, Min, Max } from 'class-validator';
+import { IsOptional, IsString, IsUUID, IsInt, IsIn, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -52,4 +52,15 @@ export class QueryDrawingDto {
   @Min(1)
   @Max(100)
   per_page?: number = 20;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  sort?: string;
+
+  @ApiPropertyOptional({ enum: ['ASC', 'DESC'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['ASC', 'DESC'])
+  order?: 'ASC' | 'DESC';
 }

@@ -49,6 +49,7 @@ export class DrawingService {
     const {
       company_id, project_id, discipline_id, drawing_type_id,
       module_id, status, search, page = 1, per_page = 20,
+      sort, order,
     } = query;
 
     const where: any = {};
@@ -60,10 +61,17 @@ export class DrawingService {
     if (status) where.status = status;
     if (search) where.document_no = Like(`%${search}%`);
 
+    const orderOption: any = {};
+    if (sort) {
+      orderOption[sort] = order || 'ASC';
+    } else {
+      orderOption.created_at = 'DESC';
+    }
+
     const [data, total] = await this.drawingRepo.findAndCount({
       where,
       relations: { company: true, project: true, module: true, discipline: true, drawing_type: true, creator: true, drafter: true },
-      order: { created_at: 'DESC' },
+      order: orderOption,
       skip: (page - 1) * per_page,
       take: per_page,
     });
@@ -96,14 +104,16 @@ export class DrawingService {
       status: 'assigned',
       created_by: userId,
     });
-    return this.drawingRepo.save(drawing);
+    await this.drawingRepo.save(drawing);
+    return this.findOne(drawing.id);
   }
 
   async update(id: string, dto: UpdateDrawingDto): Promise<Drawing> {
     const drawing = await this.drawingRepo.findOne({ where: { id } });
     if (!drawing) throw new NotFoundException('Drawing not found');
     Object.assign(drawing, dto);
-    return this.drawingRepo.save(drawing);
+    await this.drawingRepo.save(drawing);
+    return this.findOne(id);
   }
 
   async getActivities(id: string): Promise<DrawingActivity[]> {
@@ -136,14 +146,20 @@ export class DrawingService {
     drawing.status = nextStatus;
     await this.drawingRepo.save(drawing);
 
-    return this.activityRepo.save({
-      id: uuidv4(),
+    const activityId = uuidv4();
+    await this.activityRepo.save({
+      id: activityId,
       drawing_id: id,
       user_id: userId,
       action: dto.action,
       stage: dto.stage,
       return_reason: dto.return_reason || null,
     } as any);
+
+    return this.activityRepo.findOne({
+      where: { id: activityId },
+      relations: { user: true },
+    }) as Promise<DrawingActivity>;
   }
 
   async getRevisions(id: string): Promise<DrawingRevision[]> {
@@ -157,14 +173,19 @@ export class DrawingService {
 
   async createRevision(id: string, dto: CreateRevisionDto, userId: string): Promise<DrawingRevision> {
     await this.findOne(id);
+    const revisionId = uuidv4();
     const revision = this.revisionRepo.create({
-      id: uuidv4(),
+      id: revisionId,
       drawing_id: id,
       revision_no: dto.revision_no,
       description: dto.description,
       created_by: userId,
     });
-    return this.revisionRepo.save(revision);
+    await this.revisionRepo.save(revision);
+    return this.revisionRepo.findOne({
+      where: { id: revisionId },
+      relations: { creator: true, files: true },
+    }) as Promise<DrawingRevision>;
   }
 
   async getFile(fileId: string): Promise<RevisionFile> {
