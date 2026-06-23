@@ -50,23 +50,20 @@ export async function apiClient<T>(
   const method = (fetchOptions.method || "GET").toUpperCase()
   const token = getToken()
 
+  let url = `${BASE_URL}${endpoint}`
+
   const headers: Record<string, string> = {
     Accept: "application/json",
     ...(options.headers as Record<string, string>),
   }
 
   if (token) {
-    console.log(`[apiClient] ${method} ${url} - Bearer ${token.substring(0, 20)}...`)
     headers["Authorization"] = `Bearer ${token}`
-  } else {
-    console.log(`[apiClient] ${method} ${url} - no token`)
   }
 
   if (method !== "GET" && method !== "HEAD") {
     headers["Content-Type"] = "application/json"
   }
-
-  let url = `${BASE_URL}${endpoint}`
   if (params) {
     const searchParams = new URLSearchParams()
     for (const [key, value] of Object.entries(params)) {
