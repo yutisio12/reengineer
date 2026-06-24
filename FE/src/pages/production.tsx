@@ -69,19 +69,20 @@ export default function ProductionPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-mono font-black uppercase" style={{ color: "var(--color-text-primary)" }}>
+          <h1 className="macro-title text-[clamp(2rem,6vw,4rem)] text-black">
             Production List
           </h1>
-          <p className="font-mono text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="micro text-xs mt-1 text-gray-500">
             {filteredDrawings.length} drawing{filteredDrawings.length !== 1 ? "s" : ""} transmitted
           </p>
         </div>
         <button
           onClick={handleExport}
-          className="border-4 border-black px-5 py-3 font-mono font-bold text-xs uppercase flex items-center gap-2 bg-green-600 text-white hover:bg-green-700 transition-colors"
+          className="border-4 border-black px-5 py-3 font-mono font-bold text-xs uppercase flex items-center gap-2 transition-all"
+          style={{ background: "#E61919", color: "#fff" }}
         >
           <FileSpreadsheet size={16} />
-          Export Excel
+          [ EXPORT EXCEL ]
         </button>
       </div>
 
@@ -91,16 +92,16 @@ export default function ProductionPage() {
           placeholder="Cari document no atau deskripsi..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border-4 border-black px-4 py-3 font-mono text-sm flex-1 min-w-[200px] focus:outline-none focus:bg-yellow-50"
-          style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
+          className="border-4 border-black px-4 py-3 font-mono text-sm flex-1 min-w-[200px] focus:outline-none"
+          style={{ background: "#EAE8E3", color: "#111" }}
         />
         <select
           value={companyFilter}
           onChange={(e) => setCompanyFilter(e.target.value)}
-          className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none focus:bg-yellow-50"
-          style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
+          className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+          style={{ background: "#EAE8E3", color: "#111" }}
         >
-           <option value="">Semua Company</option>
+           <option value="">[ ALL COMPANIES ]</option>
           {(companies ?? []).map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
@@ -109,10 +110,10 @@ export default function ProductionPage() {
           value={projectFilter}
           onChange={(e) => setProjectFilter(e.target.value)}
           disabled={!companyFilter}
-          className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none focus:bg-yellow-50 disabled:opacity-40"
-          style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
+          className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none disabled:opacity-40"
+          style={{ background: "#EAE8E3", color: "#111" }}
         >
-          <option value="">Semua Project</option>
+          <option value="">[ ALL PROJECTS ]</option>
           {(projects ?? []).map((p) => (
             <option key={p.id} value={p.id}>{p.name}</option>
           ))}
@@ -121,20 +122,20 @@ export default function ProductionPage() {
           value={moduleFilter}
           onChange={(e) => setModuleFilter(e.target.value)}
           disabled={!projectFilter}
-          className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none focus:bg-yellow-50 disabled:opacity-40"
-          style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
+          className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none disabled:opacity-40"
+          style={{ background: "#EAE8E3", color: "#111" }}
         >
-          <option value="">Semua Module</option>
+          <option value="">[ ALL MODULES ]</option>
           {(filteredModules ?? []).map((m) => (
             <option key={m.id} value={m.id}>{m.name}</option>
           ))}
         </select>
       </div>
 
-      <div className="border-4 border-black overflow-x-auto" style={{ background: "var(--color-surface)" }}>
+      <div className="border-4 border-black overflow-x-auto" style={{ background: "#EAE8E3" }}>
         <table className="w-full font-mono text-xs">
           <thead>
-            <tr className="bg-black text-white">
+            <tr className="text-white" style={{ background: "#111" }}>
               <Th>#</Th>
               <Th>Document No</Th>
               <Th>Company</Th>
@@ -149,18 +150,16 @@ export default function ProductionPage() {
           <tbody>
             {filteredDrawings.length === 0 && (
               <tr>
-                <td colSpan={9} className="py-12 text-center font-mono text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                  Tidak ada drawing di production
+                <td colSpan={9} className="py-12 text-center font-mono text-sm text-gray-500">
+                  [ NO DRAWINGS IN PRODUCTION ]
                 </td>
               </tr>
             )}
             {filteredDrawings.map((d, i) => (
               <tr
                 key={d.id}
-                className={cn(
-                  "border-b-4 border-black hover:bg-yellow-50 transition-colors",
-                  i % 2 === 0 ? "bg-white" : "bg-gray-100",
-                )}
+                className="border-b-4 border-black"
+                style={{ background: i % 2 === 0 ? "#EAE8E3" : "#E0DDD8" }}
               >
                 <td className="px-4 py-4 text-center font-bold">{i + 1}</td>
                 <td className="px-4 py-4 font-bold">{d.document_no}</td>
@@ -178,14 +177,16 @@ export default function ProductionPage() {
                   <div className="flex items-center justify-center gap-1">
                     <button
                       onClick={() => setDetailDrawing(d)}
-                      className="border-2 border-black p-2 bg-black text-white hover:bg-white hover:text-black transition-colors"
+                      className="border-2 border-black p-2 transition-all"
+                      style={{ background: "#111", color: "#fff" }}
                       title="Detail"
                     >
                       <Eye size={14} />
                     </button>
                     <button
                       onClick={() => setReviseDrawing(d)}
-                      className="border-2 border-black p-2 bg-black text-white hover:bg-white hover:text-black transition-colors"
+                      className="border-2 border-black p-2 transition-all"
+                      style={{ background: "#E61919", color: "#fff" }}
                       title="Raise Revision"
                     >
                       <RotateCcw size={14} />
@@ -218,7 +219,7 @@ export default function ProductionPage() {
 
 function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <th className={`px-4 py-4 text-left font-bold uppercase tracking-wider border-r border-white/20 ${className}`}>
+    <th className={`px-4 py-4 text-left border-r border-white/20 ${className} micro text-[10px] font-bold`}>
       {children}
     </th>
   )
@@ -234,10 +235,10 @@ function DetailModal({ drawing, onClose }: { drawing: Drawing; onClose: () => vo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl border-4 border-black bg-white max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b-4 border-black px-6 py-4 bg-gray-50">
-          <h2 className="font-mono font-bold text-sm uppercase">Drawing Detail</h2>
-          <button onClick={onClose} className="border-2 border-black p-1.5 hover:text-red-600 transition-colors">
+      <div className="w-full max-w-2xl border-4 border-black max-h-[90vh] overflow-y-auto" style={{ background: "#F4F4F0" }}>
+        <div className="flex items-center justify-between border-b-4 border-black px-6 py-4" style={{ background: "#EAE8E3" }}>
+          <h2 className="font-mono font-bold text-sm uppercase">[ DRAWING DETAIL ]</h2>
+          <button onClick={onClose} className="border-2 border-black p-1.5 transition-all" style={{ color: "#E61919" }}>
             <X size={14} />
           </button>
         </div>
@@ -262,21 +263,21 @@ function DetailModal({ drawing, onClose }: { drawing: Drawing; onClose: () => vo
               Revision History
             </h3>
             {(!revisions || revisions.length === 0) && (
-              <p className="font-mono text-xs py-4 text-center" style={{ color: "var(--color-text-secondary)" }}>
-                No revisions
+              <p className="font-mono text-xs py-4 text-center text-gray-500">
+                [ NO REVISIONS ]
               </p>
             )}
             {revisions && revisions.length > 0 && (
               <div className="space-y-3">
                 {[...revisions].reverse().map((rev) => (
-                  <div key={rev.id} className="border-2 border-black p-4 bg-gray-50">
+                  <div key={rev.id} className="border-2 border-black p-4" style={{ background: "#EAE8E3" }}>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-xs bg-black text-white px-2 py-0.5">
-                          Rev {rev.revision_no}
+                        <span className="font-mono font-bold text-xs text-white px-2 py-0.5" style={{ background: "#111" }}>
+                          REV {rev.revision_no}
                         </span>
-                        <span className="font-mono text-[10px]" style={{ color: "var(--color-text-secondary)" }}>
-                          {rev.creator?.name || "-"} &middot; {formatDate(rev.created_at)}
+                        <span className="micro text-[10px] text-gray-500">
+                          {rev.creator?.name || "-"} | {formatDate(rev.created_at)}
                         </span>
                       </div>
                     </div>
@@ -289,7 +290,8 @@ function DetailModal({ drawing, onClose }: { drawing: Drawing; onClose: () => vo
                           <a
                             key={f.id}
                             href={`/engineering/api/revisions/files/${f.id}/download`}
-                            className="inline-flex items-center gap-1.5 border-2 border-black px-3 py-2 font-mono text-[10px] font-bold uppercase bg-white text-blue-600 hover:text-blue-800 transition-colors"
+                            className="inline-flex items-center gap-1.5 border-2 border-black px-3 py-2 font-mono text-[10px] font-bold uppercase transition-all"
+                            style={{ background: "#F4F4F0", color: "#E61919" }}
                           >
                             <Download size={12} />
                             {f.file_name}
@@ -311,10 +313,10 @@ function DetailModal({ drawing, onClose }: { drawing: Drawing; onClose: () => vo
 function Field({ label, value, className = "" }: { label: string; value: string; className?: string }) {
   return (
     <div className={className}>
-      <p className="font-mono text-[10px] font-bold uppercase tracking-wider mb-0.5" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="micro text-[10px] font-bold mb-0.5 text-gray-500">
         {label}
       </p>
-      <p className="font-mono text-xs font-bold" style={{ color: "var(--color-text-primary)" }}>
+      <p className="font-mono text-xs font-bold text-black">
         {value}
       </p>
     </div>
@@ -361,49 +363,49 @@ function RevisionModal({ drawing, onClose, onSuccess }: { drawing: Drawing; onCl
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md border-4 border-black bg-white">
-        <div className="flex items-center justify-between border-b-4 border-black px-6 py-4 bg-gray-50">
-          <h2 className="font-mono font-bold text-sm uppercase">Raise Revision</h2>
-          <button onClick={onClose} className="border-2 border-black p-1.5 hover:text-red-600 transition-colors">
+      <div className="w-full max-w-md border-4 border-black" style={{ background: "#F4F4F0" }}>
+        <div className="flex items-center justify-between border-b-4 border-black px-6 py-4" style={{ background: "#EAE8E3" }}>
+          <h2 className="font-mono font-bold text-sm uppercase">[ RAISE REVISION ]</h2>
+          <button onClick={onClose} className="border-2 border-black p-1.5 transition-all" style={{ color: "#E61919" }}>
             <X size={14} />
           </button>
         </div>
 
         <div className="p-6 space-y-5">
           <div>
-            <p className="font-mono text-[10px] font-bold uppercase mb-1" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="micro text-[10px] font-bold mb-1 text-gray-500">
               Drawing
             </p>
-            <p className="font-mono text-xs font-bold" style={{ color: "var(--color-text-primary)" }}>
+            <p className="font-mono text-xs font-bold text-black">
               {drawing.document_no} — {drawing.description || "-"}
             </p>
           </div>
 
           <div>
-            <label className="font-mono text-[10px] font-bold uppercase mb-1 block" style={{ color: "var(--color-text-secondary)" }}>
-              New Revision No {latestRev ? `(sekarang Rev ${latestRev}, rekomendasi ${nextRevHint})` : ""}
+            <label className="micro text-[10px] font-bold mb-1 block text-gray-500">
+              New Revision No {latestRev ? `(current Rev ${latestRev}, recommended ${nextRevHint})` : ""}
             </label>
             <input
               type="text"
               value={revNo}
               onChange={(e) => setRevNo(e.target.value)}
               placeholder={nextRevHint}
-              className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none focus:bg-yellow-50"
-              style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
+              className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+              style={{ background: "#EAE8E3", color: "#111" }}
             />
           </div>
 
           <div>
-            <label className="font-mono text-[10px] font-bold uppercase mb-1 block" style={{ color: "var(--color-text-secondary)" }}>
+            <label className="micro text-[10px] font-bold mb-1 block text-gray-500">
               Reason for Revision
             </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={4}
-              placeholder="Jelaskan alasan revisi..."
-              className="w-full border-4 border-black px-4 py-3 font-mono text-sm resize-none focus:outline-none focus:bg-yellow-50"
-              style={{ background: "var(--color-surface)", color: "var(--color-text-primary)" }}
+              placeholder="Describe revision reason..."
+              className="w-full border-4 border-black px-4 py-3 font-mono text-sm resize-none focus:outline-none"
+              style={{ background: "#EAE8E3", color: "#111" }}
             />
           </div>
 
@@ -411,15 +413,17 @@ function RevisionModal({ drawing, onClose, onSuccess }: { drawing: Drawing; onCl
             <button
               onClick={handleSubmit}
               disabled={raiseRevision.isPending}
-              className="flex-1 border-4 border-black py-3 font-mono font-bold text-xs uppercase bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+              className="flex-1 border-4 border-black py-3 font-mono font-bold text-xs uppercase disabled:opacity-50 transition-all"
+              style={{ background: "#E61919", color: "#fff" }}
             >
-              {raiseRevision.isPending ? "Processing..." : "Submit Revision"}
+              {raiseRevision.isPending ? ">>> PROCESSING..." : ">>> SUBMIT REVISION"}
             </button>
             <button
               onClick={onClose}
-              className="border-4 border-black py-3 px-6 font-mono font-bold text-xs uppercase bg-white text-black hover:bg-black hover:text-white transition-colors"
+              className="border-4 border-black py-3 px-6 font-mono font-bold text-xs uppercase transition-all"
+              style={{ background: "#111", color: "#fff" }}
             >
-              Cancel
+              CANCEL
             </button>
           </div>
         </div>

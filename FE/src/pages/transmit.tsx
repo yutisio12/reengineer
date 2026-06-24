@@ -55,18 +55,18 @@ export default function TransmitPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-mono font-bold uppercase">Transmit</h2>
+        <h2 className="macro-title text-[clamp(2rem,6vw,4rem)] text-black">Transmit</h2>
 
-      <div className="border-4 border-black bg-white p-6">
-        <p className="font-mono text-sm text-gray-600">
+      <div className="border-4 border-black p-6" style={{ background: "#EAE8E3" }}>
+        <p className="font-mono text-sm text-gray-500">
           Select Fully Approved drawings to transmit to the Production module.
         </p>
       </div>
 
-      <div className="border-4 border-black overflow-x-auto bg-white">
+      <div className="border-4 border-black overflow-x-auto" style={{ background: "#EAE8E3" }}>
         <table className="w-full font-mono text-sm">
           <thead>
-            <tr className="bg-black text-white uppercase text-xs">
+            <tr className="text-white uppercase text-xs" style={{ background: "#111" }}>
               <th className="w-12 px-4 py-3 border-r-4 border-white/20">
                 <input
                   type="checkbox"
@@ -76,45 +76,43 @@ export default function TransmitPage() {
                     selectedIds.size === drawings.length
                   }
                   onChange={toggleAll}
-                  className="w-5 h-5 border-2 border-white bg-transparent"
+                  className="w-5 h-5 border-2 border-white"
                 />
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Company
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Project
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Document No
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Created Date
               </th>
-              <th className="text-left px-4 py-3">Status</th>
+              <th className="text-left px-4 py-3 micro text-[10px] font-bold">Status</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center font-bold">
-                  LOADING...
+                  [ LOADING... ]
                 </td>
               </tr>
             ) : drawings?.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center font-bold">
-                  NO DRAWINGS READY FOR TRANSMIT
+                  [ NO DRAWINGS READY ]
                 </td>
               </tr>
             ) : (
               drawings?.map((drawing, i) => (
                 <tr
                   key={drawing.id}
-                  className={cn(
-                    "border-b-4 border-black transition-all hover:bg-yellow-50",
-                    i % 2 === 0 ? "bg-white" : "bg-gray-100",
-                  )}
+                  className="border-b-4 border-black"
+                  style={{ background: i % 2 === 0 ? "#EAE8E3" : "#E0DDD8" }}
                 >
                   <td className="px-4 py-3">
                     <input
@@ -154,27 +152,29 @@ export default function TransmitPage() {
       </div>
 
       {selectedIds.size > 0 && (
-        <div className="border-4 border-black bg-white p-6 space-y-4">
+        <div className="border-4 border-black p-6 space-y-4" style={{ background: "#EAE8E3" }}>
           <div>
-            <label className="block font-mono text-xs font-bold uppercase mb-2">
+            <label className="block micro text-[10px] font-bold mb-2">
               Transmit Notes{" "}
-              <span className="text-gray-400">(optional)</span>
+              <span className="text-gray-500">(optional)</span>
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+              className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+              style={{ background: "#F4F4F0", color: "#111" }}
               placeholder="Optional notes for transmission..."
             />
           </div>
 
           <button
             onClick={() => setShowConfirmModal(true)}
-            className="flex items-center gap-2 bg-green-600 text-white font-mono font-bold text-sm uppercase px-8 py-4 border-4 border-black hover:bg-green-700 transition-all"
+            className="flex items-center gap-2 font-mono font-bold text-sm uppercase px-8 py-4 border-4 border-black transition-all"
+            style={{ background: "#E61919", color: "#fff" }}
           >
             <Send size={18} />
-            Transmit {selectedIds.size} Drawing
+            [ TRANSMIT ] {selectedIds.size} Drawing
             {selectedIds.size > 1 ? "s" : ""}
           </button>
         </div>
@@ -182,9 +182,9 @@ export default function TransmitPage() {
 
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="border-4 border-black bg-white p-6 w-full max-w-md">
+          <div className="border-4 border-black p-6 w-full max-w-md" style={{ background: "#F4F4F0" }}>
             <h3 className="font-mono font-bold text-sm uppercase mb-2">
-              Confirm Transmit
+              [ CONFIRM TRANSMIT ]
             </h3>
             <p className="font-mono text-sm mb-4">
               Are you sure you want to transmit {selectedIds.size} drawing
@@ -194,15 +194,17 @@ export default function TransmitPage() {
               <button
                 onClick={handleTransmit}
                 disabled={transmitMutation.isPending}
-                className="bg-green-600 text-white font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-green-700 disabled:opacity-50 transition-all"
+                className="font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black disabled:opacity-50 transition-all"
+                style={{ background: "#E61919", color: "#fff" }}
               >
                 {transmitMutation.isPending
-                  ? "TRANSMITTING..."
-                  : "CONFIRM TRANSMIT"}
+                  ? ">>> TRANSMITTING..."
+                  : ">>> CONFIRM TRANSMIT"}
               </button>
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="bg-white text-black font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-black hover:text-white transition-all"
+                className="font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black transition-all"
+                style={{ background: "#111", color: "#fff" }}
               >
                 CANCEL
               </button>
