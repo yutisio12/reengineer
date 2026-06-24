@@ -57,10 +57,10 @@ export default function DrawingCreatePage() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="border-4 border-black bg-white p-8 space-y-6">
+          <div className="border-4 border-black p-8 space-y-6" style={{ background: "#EAE8E3" }}>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                <label className="block micro text-[10px] font-bold mb-2">
                   Company
                 </label>
                 <select
@@ -76,9 +76,10 @@ export default function DrawingCreatePage() {
                     }))
                   }}
                   required
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+                  style={{ background: "#F4F4F0", color: "#111" }}
                 >
-                  <option value="">Select Company</option>
+                  <option value="">[ SELECT COMPANY ]</option>
                   {companies?.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -88,7 +89,7 @@ export default function DrawingCreatePage() {
               </div>
 
               <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                <label className="block micro text-[10px] font-bold mb-2">
                   Project
                 </label>
                 <select
@@ -99,9 +100,10 @@ export default function DrawingCreatePage() {
                   }}
                   required
                   disabled={!companyId}
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 disabled:opacity-40"
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none disabled:opacity-40"
+                  style={{ background: "#F4F4F0", color: "#111" }}
                 >
-                  <option value="">Select Project</option>
+                  <option value="">[ SELECT PROJECT ]</option>
                   {projects?.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -111,7 +113,7 @@ export default function DrawingCreatePage() {
               </div>
 
               <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                <label className="block micro text-[10px] font-bold mb-2">
                   Module
                 </label>
                 <select
@@ -121,9 +123,10 @@ export default function DrawingCreatePage() {
                   }
                   required
                   disabled={!form.project_id}
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 disabled:opacity-40"
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none disabled:opacity-40"
+                  style={{ background: "#F4F4F0", color: "#111" }}
                 >
-                  <option value="">Select Module</option>
+                  <option value="">[ SELECT MODULE ]</option>
                   {modules?.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name}
@@ -133,7 +136,7 @@ export default function DrawingCreatePage() {
               </div>
 
               <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                <label className="block micro text-[10px] font-bold mb-2">
                   Discipline
                 </label>
                 <select
@@ -145,9 +148,10 @@ export default function DrawingCreatePage() {
                     }))
                   }
                   required
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+                  style={{ background: "#F4F4F0", color: "#111" }}
                 >
-                  <option value="">Select Discipline</option>
+                  <option value="">[ SELECT DISCIPLINE ]</option>
                   {disciplines?.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.name}
@@ -157,7 +161,7 @@ export default function DrawingCreatePage() {
               </div>
 
               <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                <label className="block micro text-[10px] font-bold mb-2">
                   Drawing Type
                 </label>
                 <select
@@ -169,9 +173,10 @@ export default function DrawingCreatePage() {
                     }))
                   }
                   required
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+                  style={{ background: "#F4F4F0", color: "#111" }}
                 >
-                  <option value="">Select Type</option>
+                  <option value="">[ SELECT TYPE ]</option>
                   {drawingTypes?.map((dt) => (
                     <option key={dt.id} value={dt.id}>
                       {dt.code} — {dt.name}
@@ -181,7 +186,7 @@ export default function DrawingCreatePage() {
               </div>
 
               <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                <label className="block micro text-[10px] font-bold mb-2">
                   Document No
                 </label>
                 <input
@@ -194,13 +199,14 @@ export default function DrawingCreatePage() {
                     }))
                   }
                   required
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+                  style={{ background: "#F4F4F0", color: "#111" }}
                   placeholder="e.g. DOC-001"
                 />
               </div>
 
               <div>
-                <label className="block font-mono text-xs font-bold uppercase mb-2">
+                <label className="block micro text-[10px] font-bold mb-2">
                   Assign Drafter
                 </label>
                 <select
@@ -212,9 +218,10 @@ export default function DrawingCreatePage() {
                     }))
                   }
                   required
-                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+                  className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+                  style={{ background: "#F4F4F0", color: "#111" }}
                 >
-                  <option value="">Select Drafter</option>
+                  <option value="">[ SELECT DRAFTER ]</option>
                   {drafters?.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.name}
@@ -225,9 +232,9 @@ export default function DrawingCreatePage() {
             </div>
 
             <div>
-              <label className="block font-mono text-xs font-bold uppercase mb-2">
+              <label className="block micro text-[10px] font-bold mb-2">
                 Notes / Description
-                <span className="text-gray-400 ml-1">(optional)</span>
+                <span className="text-gray-500 ml-1">(optional)</span>
               </label>
               <textarea
                 value={form.description}
@@ -238,7 +245,8 @@ export default function DrawingCreatePage() {
                   }))
                 }
                 rows={3}
-                className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
+                className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+                style={{ background: "#F4F4F0", color: "#111" }}
                 placeholder="Optional notes..."
               />
             </div>
@@ -248,14 +256,16 @@ export default function DrawingCreatePage() {
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="bg-green-600 text-white font-mono font-bold text-sm uppercase px-12 py-4 border-4 border-black hover:bg-green-700 disabled:opacity-50 transition-all"
+              className="font-mono font-bold text-sm uppercase px-12 py-4 border-4 border-black disabled:opacity-50 transition-all"
+              style={{ background: "#E61919", color: "#fff" }}
             >
-              {createMutation.isPending ? "SAVING..." : "SAVE"}
+              {createMutation.isPending ? ">>> SAVING..." : ">>> SAVE"}
             </button>
             <button
               type="button"
               onClick={() => navigate("/drawings")}
-              className="bg-white text-black font-mono font-bold text-sm uppercase px-12 py-4 border-4 border-black hover:bg-black hover:text-white transition-all"
+              className="font-mono font-bold text-sm uppercase px-12 py-4 border-4 border-black transition-all"
+              style={{ background: "#111", color: "#fff" }}
             >
               CANCEL
             </button>

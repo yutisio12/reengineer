@@ -116,36 +116,36 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative w-full h-full bg-white overflow-hidden flex">
+    <div className="relative w-full h-full overflow-hidden flex" style={{ background: "#F4F4F0" }}>
       <GridSVG />
 
       <div className="flex-1 flex flex-col justify-center px-12 lg:px-24 xl:px-32 relative z-10">
         <div className="max-w-md">
           <div className="mb-2 flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-600 border-2 border-black flex items-center justify-center">
-              <span className="text-white font-mono font-bold text-xs">EA</span>
+            <div className="w-8 h-8" style={{ background: "#E61919" }}>
+              <span className="text-white font-mono font-bold text-xs flex items-center justify-center w-full h-full">EA</span>
             </div>
-            <span className="font-mono text-xs font-bold uppercase text-gray-400 tracking-widest">
-              v1.0 — Engineering Module
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.1em] text-gray-400">
+              [ ENGINEERING MODULE ]
             </span>
           </div>
 
-          <h1 className="text-5xl lg:text-6xl font-mono font-extrabold uppercase leading-[0.9] mb-2 text-black">
+          <h1 className="macro-title text-[clamp(2.5rem,8vw,5rem)] mb-3 text-black">
             Engineer
             <br />
             Activity
             <br />
             Tracker
           </h1>
-          <div className="w-24 h-2 bg-yellow-500 mb-8" />
+          <div className="w-24 h-1.5 mb-8" style={{ background: "#E61919" }} />
 
-          <p className="font-mono text-sm text-gray-500 mb-10 max-w-sm leading-relaxed">
+          <p className="micro text-xs text-gray-500 mb-10 max-w-sm leading-relaxed">
             Track, review, and approve engineering drawings from draft to production.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5 max-w-sm">
             <div>
-              <label className="block font-mono text-xs font-bold uppercase mb-2 text-gray-600">
+              <label className="block micro text-[10px] font-bold mb-2 text-gray-600">
                 Email
               </label>
               <input
@@ -153,13 +153,14 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 focus:border-green-600 transition-all"
+                className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none transition-all"
+                style={{ background: "#EAE8E3", color: "#111" }}
                 placeholder="you@company.com"
               />
             </div>
 
             <div>
-              <label className="block font-mono text-xs font-bold uppercase mb-2 text-gray-600">
+              <label className="block micro text-[10px] font-bold mb-2 text-gray-600">
                 Password
               </label>
               <input
@@ -167,13 +168,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 focus:border-green-600 transition-all"
+                className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none transition-all"
+                style={{ background: "#EAE8E3", color: "#111" }}
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <div className="border-4 border-red-600 bg-red-100 px-4 py-3 font-mono text-sm font-bold text-red-800">
+              <div className="border-4 border-red-600 px-4 py-3 font-mono text-sm font-bold" style={{ background: "#EAE8E3", color: "#E61919" }}>
                 {error}
               </div>
             )}
@@ -181,31 +183,33 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-green-600 text-white font-mono font-bold text-sm uppercase px-6 py-4 border-4 border-black hover:bg-green-700 active:bg-green-800 disabled:opacity-50 transition-all"
+              className="w-full font-mono font-bold text-sm uppercase px-6 py-4 border-4 border-black disabled:opacity-50 transition-all"
+              style={{ background: "#E61919", color: "#fff" }}
             >
-              {loading ? "AUTHENTICATING..." : "LOGIN →"}
+              {loading ? ">>> AUTHENTICATING..." : ">>> LOGIN"}
             </button>
 
-<div className="pt-2">
-  <div className="border-t-4 border-gray-200 pt-4">
-    <button
-      type="button"
-      onClick={handleGuest}
-      disabled={loading}
-      className="w-full bg-yellow-500 ..."
-    >
-      ⚡ Guest Access
-    </button>
-    <p className="font-mono text-[10px] text-gray-400 mt-2">
-      Pre-filled credentials available. Click Guest for instant access.
-    </p>
-  </div>
-</div>
+            <div className="pt-2">
+              <div className="pt-4" style={{ borderTop: "4px solid #111" }}>
+                <button
+                  type="button"
+                  onClick={handleGuest}
+                  disabled={loading}
+                  className="w-full font-mono font-bold text-sm uppercase px-6 py-4 border-4 border-black disabled:opacity-50 transition-all"
+                  style={{ background: "#111", color: "#fff" }}
+                >
+                  [ GUEST ACCESS ]
+                </button>
+                <p className="micro text-[10px] text-gray-400 mt-2">
+                  Pre-filled credentials. Click for instant access.
+                </p>
+              </div>
+            </div>
           </form>
         </div>
       </div>
 
-      <div className="hidden lg:flex flex-1 bg-green-600 relative items-center justify-center overflow-hidden">
+      <div className="hidden lg:flex flex-1 relative items-center justify-center overflow-hidden" style={{ background: "#E61919" }}>
         <div className="absolute inset-0 opacity-10">
           <GridSVG />
         </div>
@@ -218,14 +222,14 @@ export default function LoginPage() {
 
           <div className="mt-10 space-y-2">
             <div className="font-mono text-white/80 text-sm border-t-2 border-b-2 border-white/20 py-4 inline-block px-8">
-              <div className="font-bold text-white text-base mb-1">DRAWING ACTIVITY MODULE</div>
-              <div className="text-xs">Drafter → Checker → Engineer → Production</div>
+              <div className="font-bold text-white text-base mb-1">[ DRAWING ACTIVITY MODULE ]</div>
+              <div className="text-xs tracking-wider">Drafter /// Checker /// Engineer /// Production</div>
             </div>
           </div>
 
           <div className="mt-8 font-mono text-xs text-white/40 space-y-1">
             <div className="flex items-center justify-center gap-6">
-              <span>── ✦ ──</span>
+              <span>REV 2.6 /// UNIT / D-01 /// +++</span>
             </div>
           </div>
         </div>

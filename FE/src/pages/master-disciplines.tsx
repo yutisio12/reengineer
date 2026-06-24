@@ -20,24 +20,24 @@ function EditModal({ item, onClose }: { item: Discipline; onClose: () => void })
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="border-4 border-black bg-white p-6 w-full max-w-md">
+      <div className="border-4 border-black p-6 w-full max-w-md" style={{ background: "#EAE8E3" }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-mono font-bold text-sm uppercase">Edit Discipline</h3>
-          <button onClick={onClose} className="hover:text-red-600"><X size={18} /></button>
+          <button onClick={onClose}><X size={18} /></button>
         </div>
         <div className="space-y-4">
           <div>
             <label className="block font-mono text-xs font-bold uppercase mb-2">Code</label>
-            <input value={code} onChange={(e) => setCode(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50" />
+            <input value={code} onChange={(e) => setCode(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none" style={{ background: "#F4F4F0" }} />
           </div>
           <div>
             <label className="block font-mono text-xs font-bold uppercase mb-2">Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50" />
+            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none" style={{ background: "#F4F4F0" }} />
           </div>
         </div>
         <div className="flex gap-3 mt-6">
-          <button onClick={handleSave} disabled={mutation.isPending} className="bg-green-600 text-white font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-green-700 disabled:opacity-50 transition-all">{mutation.isPending ? "SAVING..." : "SAVE"}</button>
-          <button onClick={onClose} className="bg-white text-black font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-black hover:text-white transition-all">CANCEL</button>
+          <button onClick={handleSave} disabled={mutation.isPending} className="text-white font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black disabled:opacity-50 transition-all" style={{ background: "#E61919", color: "#fff" }}>{mutation.isPending ? "SAVING..." : "SAVE"}</button>
+          <button onClick={onClose} className="text-black font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-black hover:text-white transition-all" style={{ background: "#EAE8E3" }}>CANCEL</button>
         </div>
       </div>
     </div>
@@ -59,24 +59,24 @@ function AddModal({ onClose }: { onClose: () => void }) {
   }
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="border-4 border-black bg-white p-6 w-full max-w-md">
+      <div className="border-4 border-black p-6 w-full max-w-md" style={{ background: "#EAE8E3" }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-mono font-bold text-sm uppercase">Add Discipline</h3>
-          <button onClick={onClose} className="hover:text-red-600"><X size={18} /></button>
+          <button onClick={onClose}><X size={18} /></button>
         </div>
         <div className="space-y-4">
           <div>
             <label className="block font-mono text-xs font-bold uppercase mb-2">Code</label>
-            <input value={code} onChange={(e) => setCode(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50" />
+            <input value={code} onChange={(e) => setCode(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none" style={{ background: "#F4F4F0" }} />
           </div>
           <div>
             <label className="block font-mono text-xs font-bold uppercase mb-2">Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50" />
+            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none" style={{ background: "#F4F4F0" }} />
           </div>
         </div>
         <div className="flex gap-3 mt-6">
-          <button onClick={handleSave} disabled={mutation.isPending || !name || !code} className="bg-green-600 text-white font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-green-700 disabled:opacity-50 transition-all">{mutation.isPending ? "SAVING..." : "SAVE"}</button>
-          <button onClick={onClose} className="bg-white text-black font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-black hover:text-white transition-all">CANCEL</button>
+          <button onClick={handleSave} disabled={mutation.isPending || !name || !code} className="text-white font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black disabled:opacity-50 transition-all" style={{ background: "#E61919", color: "#fff" }}>{mutation.isPending ? "SAVING..." : "SAVE"}</button>
+          <button onClick={onClose} className="text-black font-mono font-bold text-xs uppercase px-6 py-3 border-4 border-black hover:bg-black hover:text-white transition-all" style={{ background: "#EAE8E3" }}>CANCEL</button>
         </div>
       </div>
     </div>
@@ -92,9 +92,9 @@ export function MasterDisciplinesPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-mono font-bold uppercase">Disciplines</h2>
-        <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 bg-green-600 text-white font-mono font-bold text-sm uppercase px-5 py-3 border-4 border-black hover:bg-green-700 transition-all"><Plus size={16} /> Add</button>
+        <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 text-white font-mono font-bold text-sm uppercase px-5 py-3 border-4 border-black transition-all" style={{ background: "#E61919", color: "#fff" }}><Plus size={16} /> Add</button>
       </div>
-      <div className="border-4 border-black bg-white">
+      <div className="border-4 border-black" style={{ background: "#EAE8E3" }}>
         <table className="w-full font-mono text-sm">
           <thead>
             <tr className="bg-black text-white uppercase text-xs">
@@ -107,7 +107,7 @@ export function MasterDisciplinesPage() {
             {isLoading ? (<tr><td colSpan={3} className="px-4 py-12 text-center font-bold">LOADING...</td></tr>
             ) : disciplines?.length === 0 ? (<tr><td colSpan={3} className="px-4 py-12 text-center font-bold">NO DATA</td></tr>
             ) : (disciplines?.map((d, i) => (
-              <tr key={d.id} className={cn("border-b-4 border-black", i % 2 === 0 ? "bg-white" : "bg-gray-100")}>
+              <tr key={d.id} style={{ background: i % 2 === 0 ? "#EAE8E3" : "#E0DDD8" }} className="border-b-4 border-black">
                 <td className="px-4 py-3 font-bold">{d.code}</td>
                 <td className="px-4 py-3">{d.name}</td>
                 <td className="px-4 py-3">

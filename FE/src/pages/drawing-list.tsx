@@ -25,7 +25,7 @@ export default function DrawingListPage() {
   const { data: drawingTypes } = useDrawingTypes()
   const { data: modules } = useModules(filters.project_id)
   const { data: disciplines } = useDisciplines()
-  const { data, isLoading } = useDrawings(filters)
+  const { data, isLoading, isError, error } = useDrawings(filters)
 
   return (
     <div className="space-y-6">
@@ -33,13 +33,14 @@ export default function DrawingListPage() {
         <h2 className="text-2xl font-mono font-bold uppercase">List Drawing</h2>
         <Link
           to="/drawings/create"
-          className="bg-green-600 text-white font-mono font-bold text-sm uppercase px-6 py-3 border-4 border-black hover:bg-green-700 transition-all"
+          className="font-mono font-bold text-sm uppercase px-6 py-3 border-4 border-black transition-all"
+          style={{ background: "#E61919", color: "#fff" }}
         >
           + Create
         </Link>
       </div>
 
-      <div className="border-4 border-black bg-white p-6">
+      <div className="border-4 border-black p-6" style={{ background: "#EAE8E3" }}>
         <div className="flex flex-wrap gap-4">
           <select
             value={filters.company_id || ""}
@@ -51,9 +52,10 @@ export default function DrawingListPage() {
                 page: 1,
               }))
             }
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[180px]"
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none min-w-[180px]"
+            style={{ background: "#F4F4F0", color: "#111" }}
           >
-            <option value="">All Companies</option>
+            <option value="">[ ALL COMPANIES ]</option>
             {companies?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -70,9 +72,10 @@ export default function DrawingListPage() {
                 page: 1,
               }))
             }
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[180px]"
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none min-w-[180px]"
+            style={{ background: "#F4F4F0", color: "#111" }}
           >
-            <option value="">All Projects</option>
+            <option value="">[ ALL PROJECTS ]</option>
             {projects?.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
@@ -89,9 +92,10 @@ export default function DrawingListPage() {
                 page: 1,
               }))
             }
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[180px]"
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none min-w-[180px]"
+            style={{ background: "#F4F4F0", color: "#111" }}
           >
-            <option value="">All Disciplines</option>
+            <option value="">[ ALL DISCIPLINES ]</option>
             {disciplines?.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.name}
@@ -108,9 +112,10 @@ export default function DrawingListPage() {
                 page: 1,
               }))
             }
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[150px]"
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none min-w-[150px]"
+            style={{ background: "#F4F4F0", color: "#111" }}
           >
-            <option value="">All Types</option>
+            <option value="">[ ALL TYPES ]</option>
             {drawingTypes?.map((dt) => (
               <option key={dt.id} value={dt.id}>
                 {dt.code}
@@ -127,9 +132,10 @@ export default function DrawingListPage() {
                 page: 1,
               }))
             }
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[150px]"
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none min-w-[150px]"
+            style={{ background: "#F4F4F0", color: "#111" }}
           >
-            <option value="">All Modules</option>
+            <option value="">[ ALL MODULES ]</option>
             {modules?.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
@@ -146,9 +152,10 @@ export default function DrawingListPage() {
                 page: 1,
               }))
             }
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50 min-w-[150px]"
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none min-w-[150px]"
+            style={{ background: "#F4F4F0", color: "#111" }}
           >
-            <option value="">All Status</option>
+            <option value="">[ ALL STATUS ]</option>
             {Object.entries(STATUS_LABEL).map(([key, label]) => (
               <option key={key} value={key}>
                 {label}
@@ -158,61 +165,67 @@ export default function DrawingListPage() {
         </div>
       </div>
 
-      <div className="border-4 border-black overflow-x-auto bg-white">
+      <div className="border-4 border-black overflow-x-auto" style={{ background: "#EAE8E3" }}>
         <table className="w-full font-mono text-sm">
           <thead>
-            <tr className="bg-black text-white uppercase text-xs">
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+            <tr className="text-white uppercase text-xs" style={{ background: "#111" }}>
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Company
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Project
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Discipline
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Type
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Module
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Document No
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Created By
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Created Date
               </th>
-              <th className="text-left px-4 py-3 border-r-4 border-white/20">
+              <th className="text-left px-4 py-3 border-r-4 border-white/20 micro text-[10px] font-bold">
                 Status
               </th>
-              <th className="text-left px-4 py-3">Action</th>
+              <th className="text-left px-4 py-3 micro text-[10px] font-bold">Action</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
                 <td colSpan={10} className="px-4 py-12 text-center font-bold">
-                  LOADING...
+                  [ LOADING... ]
+                </td>
+              </tr>
+            ) : isError ? (
+              <tr>
+                <td colSpan={10} className="px-4 py-12 text-center">
+                  <span className="font-bold text-sm" style={{ color: "#E61919" }}>
+                    [ ERROR: {error instanceof Error ? error.message : "API request failed"} ]
+                  </span>
                 </td>
               </tr>
             ) : data?.data.length === 0 ? (
               <tr>
                 <td colSpan={10} className="px-4 py-12 text-center font-bold">
-                  NO DATA FOUND
+                  [ NO DATA ]
                 </td>
               </tr>
             ) : (
               data?.data.map((drawing, i) => (
                 <tr
                   key={drawing.id}
-                  className={cn(
-                    "border-b-4 border-black transition-all hover:bg-yellow-50",
-                    i % 2 === 0 ? "bg-white" : "bg-gray-100",
-                  )}
+                  className="border-b-4 border-black"
+                  style={{ background: i % 2 === 0 ? "#EAE8E3" : "#E0DDD8" }}
                 >
                   <td className="px-4 py-3 font-bold">
                     {drawing.company?.name || "-"}
@@ -260,7 +273,7 @@ export default function DrawingListPage() {
         </table>
 
         {data && (
-          <div className="flex items-center justify-between border-t-4 border-black px-4 py-4 bg-white">
+          <div className="flex items-center justify-between border-t-4 border-black px-4 py-4" style={{ background: "#EAE8E3" }}>
             <span className="font-mono text-xs font-bold">
               Page {data.page} of {data.total_pages} ({data.total} total)
             </span>
