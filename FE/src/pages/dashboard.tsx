@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState, useMemo } from "react"
+import { useEffect, useRef, useState, useMemo, useCallback } from "react"
 import {
   useDrawings, useProjects, useModules,
   useDisciplines, useUsers,
 } from "../hooks/use-api"
 
 const STATUS_GROUP: Record<string, { label: string; color: string }> = {
-  draft: { label: "Assigned / Draft", color: "#EAB308" },
-  onProgress: { label: "In Progress", color: "#3B82F6" },
-  ifr: { label: "IFR / Review", color: "#F97316" },
-  ifc: { label: "IFC / Complete", color: "#22C55E" },
+  draft: { label: "Assigned / Draft", color: "#666" },
+  onProgress: { label: "In Progress", color: "#111" },
+  ifr: { label: "IFR / Review", color: "#E61919" },
+  ifc: { label: "IFC / Complete", color: "#111" },
 }
 
 function getGroup(status: string): string {
@@ -51,13 +51,10 @@ export default function DashboardPage() {
     const onProgress = filteredDrawings.filter((d) => getGroup(d.status) === "onProgress").length
     const ifrCount = filteredDrawings.filter((d) => getGroup(d.status) === "ifr").length
     const draft = filteredDrawings.filter((d) => getGroup(d.status) === "draft").length
-
     const now = new Date()
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime()
     const addedThisMonth = filteredDrawings.filter((d) => new Date(d.created_at).getTime() >= monthStart).length
-
     const overallPct = total > 0 ? Math.round((ifc / total) * 100) : 0
-
     return { total, ifc, onProgress, ifrCount, draft, addedThisMonth, overallPct }
   }, [filteredDrawings])
 
@@ -75,7 +72,6 @@ export default function DashboardPage() {
     const labels: string[] = []
     const selesai: number[] = []
     const sisa: number[] = []
-
     for (const disc of discList) {
       const total = filteredDrawings.filter((d) => d.discipline_id === disc.id).length
       if (total === 0) continue
@@ -84,7 +80,6 @@ export default function DashboardPage() {
       selesai.push(done)
       sisa.push(total - done)
     }
-
     return { labels, selesai, sisa }
   }, [filteredDrawings, disciplines])
 
@@ -92,26 +87,19 @@ export default function DashboardPage() {
     const months: string[] = []
     const baru: number[] = []
     const selesai: number[] = []
-
     for (let i = 4; i >= 0; i--) {
       const d = new Date()
       d.setMonth(d.getMonth() - i)
       months.push(d.toLocaleDateString("id", { month: "short" }))
       const start = new Date(d.getFullYear(), d.getMonth(), 1).getTime()
       const end = new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime()
-
-      baru.push(drawings.filter((dw) => {
-        const t = new Date(dw.created_at).getTime()
-        return t >= start && t < end
-      }).length)
-
+      baru.push(drawings.filter((dw) => { const t = new Date(dw.created_at).getTime(); return t >= start && t < end }).length)
       selesai.push(drawings.filter((dw) => {
         if (dw.status !== "fully_approved" && dw.status !== "transmitted") return false
         const t = new Date(dw.updated_at).getTime()
         return t >= start && t < end
       }).length)
     }
-
     return { months, baru, selesai }
   }, [drawings])
 
@@ -124,26 +112,25 @@ export default function DashboardPage() {
       const done = drawings.filter((d) => d.assigned_drafter === eng.id && (d.status === "fully_approved" || d.status === "transmitted")).length
       const pct = assigned > 0 ? Math.round((done / assigned) * 100) : 0
       const initial = eng.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
-      const colorMap: Record<string, string> = {
-        drafter: "#3B82F6",
-        checker: "#F97316",
-        engineer: "#22C55E",
-      }
-      return { ...eng, assigned, done, pct, initial, barColor: colorMap[eng.role] || "#3B82F6" }
+      return { ...eng, assigned, done, pct, initial }
     })
   }, [drawings, users])
 
   const firstProject = projects?.[0]
   const firstModule = modules?.find((m) => m.project_id === firstProject?.id)
 
+  const donutRef = useDonutChart(statusDistribution)
+  const barRef = useStackedBarChart(progressPerDiscipline)
+  const lineRef = useLineChart(trendData)
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-mono font-black uppercase" style={{ color: "var(--color-text-primary)" }}>
+          <h1 className="macro-title text-[clamp(2rem,6vw,4rem)] text-black">
             Dashboard
           </h1>
-          <p className="font-mono text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="micro text-xs mt-1 text-gray-500">
             {firstProject?.name ?? "-"} / {firstModule?.name ?? "-"}
           </p>
         </div>
@@ -151,10 +138,10 @@ export default function DashboardPage() {
           <select
             value={disciplineFilter}
             onChange={(e) => setDisciplineFilter(e.target.value)}
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
-            style={{ color: "var(--color-text-primary)", background: "var(--color-surface)" }}
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+            style={{ background: "#EAE8E3", color: "#111" }}
           >
-            <option value="">Semua Disiplin</option>
+            <option value="">[ ALL DISCIPLINES ]</option>
             {(disciplines ?? []).map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
             ))}
@@ -162,112 +149,108 @@ export default function DashboardPage() {
           <select
             value={periodFilter}
             onChange={(e) => setPeriodFilter(e.target.value)}
-            className="border-4 border-black px-4 py-3 font-mono text-sm bg-white focus:outline-none focus:bg-yellow-50"
-            style={{ color: "var(--color-text-primary)", background: "var(--color-surface)" }}
+            className="border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
+            style={{ background: "#EAE8E3", color: "#111" }}
           >
-            <option value="all">All Time</option>
-            <option value="month">Bulan Ini</option>
-            <option value="3months">3 Bulan</option>
+            <option value="all">[ ALL TIME ]</option>
+            <option value="month">[ THIS MONTH ]</option>
+            <option value="3months">[ 3 MONTHS ]</option>
           </select>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <MetricCard
           icon="ti-files"
-          label="Total Drawing"
+          label="[ TOTAL DRAWINGS ]"
           value={metrics.total}
-          sub={metrics.addedThisMonth > 0 ? `+${metrics.addedThisMonth} bulan ini` : ""}
-          color="#000"
+          sub={metrics.addedThisMonth > 0 ? `+${metrics.addedThisMonth} this month` : ""}
+          color="#111"
         />
         <MetricCard
           icon="ti-circle-check"
-          label="Selesai (IFC)"
+          label="[ COMPLETED (IFC) ]"
           value={metrics.ifc}
-          sub={`${metrics.overallPct}% dari total`}
-          color="#22C55E"
+          sub={`${metrics.overallPct}% of total`}
+          color="#111"
         />
         <MetricCard
           icon="ti-clock"
-          label="In Progress"
+          label="[ IN PROGRESS ]"
           value={metrics.onProgress + metrics.ifrCount}
           sub={`${metrics.onProgress} drafter, ${metrics.ifrCount} review`}
-          color="#3B82F6"
+          color="#E61919"
         />
         <MetricCard
           icon="ti-list"
-          label="Assigned / Draft"
+          label="[ ASSIGNED / DRAFT ]"
           value={metrics.draft}
-          sub="Menunggu pengerjaan"
-          color="#EAB308"
+          sub="Awaiting work"
+          color="#666"
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="Distribusi Status">
           <StatusLegend items={statusDistribution} />
           <div className="relative" style={{ height: 240 }}>
-            <canvas ref={useDonutChart(statusDistribution)} />
+            <canvas ref={donutRef} />
           </div>
         </ChartCard>
 
-        <ChartCard title="Progres per Disiplin">
+        <ChartCard title="Progress per Discipline">
           <div className="flex items-center gap-4 mb-3">
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3" style={{ background: "#22C55E" }} />
-              <span className="font-mono text-[10px] font-bold uppercase" style={{ color: "var(--color-text-secondary)" }}>Selesai</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3" style={{ background: "#86EFAC" }} />
-              <span className="font-mono text-[10px] font-bold uppercase" style={{ color: "var(--color-text-secondary)" }}>Sisa</span>
-            </div>
+            <span className="flex items-center gap-1.5 micro text-[10px] font-bold text-gray-500">
+              <span className="inline-block w-3 h-3 border border-black" style={{ background: "#111" }} />Complete
+            </span>
+            <span className="flex items-center gap-1.5 micro text-[10px] font-bold text-gray-500">
+              <span className="inline-block w-3 h-3 border border-black" style={{ background: "#999" }} />Remaining
+            </span>
           </div>
           <div style={{ height: 240 }}>
-            <canvas ref={useStackedBarChart(progressPerDiscipline)} />
+            <canvas ref={barRef} />
           </div>
         </ChartCard>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
-        <ChartCard title="Tren Drawing per Bulan">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard title="Monthly Drawing Trend">
           <div className="flex items-center gap-4 mb-3">
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block w-5 h-0.5" style={{ background: "#3B82F6" }} />
-              <span className="font-mono text-[10px] font-bold uppercase" style={{ color: "var(--color-text-secondary)" }}>Baru</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block w-5 h-0.5 border-t-2 border-dashed" style={{ borderColor: "#22C55E" }} />
-              <span className="font-mono text-[10px] font-bold uppercase" style={{ color: "var(--color-text-secondary)" }}>Selesai</span>
-            </div>
+            <span className="flex items-center gap-1.5 micro text-[10px] font-bold text-gray-500">
+              <span className="inline-block w-5 h-0.5" style={{ background: "#111" }} />New
+            </span>
+            <span className="flex items-center gap-1.5 micro text-[10px] font-bold text-gray-500">
+              <span className="inline-block w-5 h-0.5 border-t-2 border-dashed" style={{ borderColor: "#E61919" }} />Complete
+            </span>
           </div>
           <div style={{ height: 200 }}>
-            <canvas ref={useLineChart(trendData)} />
+            <canvas ref={lineRef} />
           </div>
         </ChartCard>
 
-        <ChartCard title="Beban Kerja per Engineer">
+        <ChartCard title="Engineer Workload">
           <div className="space-y-4">
             {engineerWorkload.map((eng) => (
               <div key={eng.id} className="flex items-center gap-3">
                 <div
                   className="w-9 h-9 border-2 border-black flex items-center justify-center shrink-0"
-                  style={{ background: eng.barColor }}
+                  style={{ background: "#111" }}
                 >
                   <span className="text-white font-mono font-bold text-[10px]">{eng.initial}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-xs font-bold uppercase truncate" style={{ color: "var(--color-text-primary)" }}>
+                    <span className="micro text-xs font-bold truncate text-black">
                       {eng.name}
                     </span>
-                    <span className="font-mono text-[10px] font-bold" style={{ color: "var(--color-text-secondary)" }}>
+                    <span className="micro text-[10px] font-bold text-gray-500">
                       {eng.done}/{eng.assigned}
                     </span>
                   </div>
-                  <div className="h-2 border-2 border-black w-full" style={{ background: "#f0f0f0" }}>
+                  <div className="h-2 border-2 border-black w-full" style={{ background: "#D4D4D0" }}>
                     <div
                       className="h-full transition-all"
-                      style={{ width: `${eng.pct}%`, background: eng.pct >= 100 ? "#22C55E" : eng.pct > 60 ? "#3B82F6" : "#F97316" }}
+                      style={{ width: `${eng.pct}%`, background: eng.pct >= 100 ? "#111" : "#E61919" }}
                     />
                   </div>
                 </div>
@@ -294,10 +277,10 @@ function MetricCard({
   color: string
 }) {
   return (
-    <div className="border-4 border-black p-5" style={{ background: "var(--color-surface)" }}>
+    <div className="border-4 border-black p-5" style={{ background: "#EAE8E3" }}>
       <div className="flex items-center gap-2 mb-3">
-        <i className={`${icon} text-lg`} style={{ color }} />
-        <span className="font-mono text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>
+        <i className={`ti ${icon} text-lg`} style={{ color }} />
+        <span className="micro text-[10px] font-bold text-gray-500">
           {label}
         </span>
       </div>
@@ -305,7 +288,7 @@ function MetricCard({
         {value}
       </p>
       {sub && (
-        <p className="font-mono text-[10px] font-bold" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="micro text-[10px] font-bold text-gray-500">
           {sub}
         </p>
       )}
@@ -315,9 +298,9 @@ function MetricCard({
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border-4 border-black p-5" style={{ background: "var(--color-surface)" }}>
-      <h3 className="font-mono font-bold text-xs uppercase mb-4" style={{ color: "var(--color-text-primary)" }}>
-        {title}
+    <div className="border-4 border-black p-5" style={{ background: "#EAE8E3" }}>
+      <h3 className="micro text-xs font-bold mb-4 text-black">
+        [ {title} ]
       </h3>
       {children}
     </div>
@@ -330,10 +313,10 @@ function StatusLegend({ items }: { items: Array<{ label: string; count: number; 
       {items.map((item) => (
         <div key={item.label} className="flex items-center gap-1.5">
           <span className="inline-block w-3 h-3 border border-black" style={{ background: item.color }} />
-          <span className="font-mono text-[10px] font-bold uppercase" style={{ color: "var(--color-text-secondary)" }}>
+          <span className="micro text-[10px] font-bold text-gray-500">
             {item.label}
           </span>
-          <span className="font-mono text-[10px] font-bold" style={{ color: "var(--color-text-primary)" }}>
+          <span className="micro text-[10px] font-bold text-black">
             {item.count}
           </span>
         </div>
@@ -396,16 +379,16 @@ function useStackedBarChart(data: { labels: string[]; selesai: number[]; sisa: n
       data: {
         labels: data.labels,
         datasets: [
-          { label: "Selesai", data: data.selesai, backgroundColor: "#22C55E", borderRadius: 0, borderSkipped: true },
-          { label: "Sisa", data: data.sisa, backgroundColor: "#86EFAC", borderRadius: 0, borderSkipped: true },
+          { label: "Complete", data: data.selesai, backgroundColor: "#111", borderRadius: 0, borderSkipped: true },
+          { label: "Remaining", data: data.sisa, backgroundColor: "#999", borderRadius: 0, borderSkipped: true },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: { stacked: true, grid: { display: false }, ticks: { font: { family: "ui-monospace, Consolas, monospace", size: 10 } } },
-          y: { stacked: true, beginAtZero: true, grid: { color: "#ddd" }, ticks: { font: { family: "ui-monospace, Consolas, monospace", size: 10 }, stepSize: 1 } },
+          x: { stacked: true, grid: { display: false }, ticks: { font: { family: "JetBrains Mono, ui-monospace, monospace", size: 10 } } },
+          y: { stacked: true, beginAtZero: true, grid: { color: "#D4D4D0" }, ticks: { font: { family: "JetBrains Mono, ui-monospace, monospace", size: 10 }, stepSize: 1 } },
         },
         plugins: { legend: { display: false }, tooltip: { enabled: true } },
       },
@@ -434,29 +417,29 @@ function useLineChart(data: { months: string[]; baru: number[]; selesai: number[
         labels: data.months,
         datasets: [
           {
-            label: "Baru",
+            label: "New",
             data: data.baru,
-            borderColor: "#3B82F6",
+            borderColor: "#111",
             backgroundColor: "transparent",
             borderWidth: 2,
             fill: false,
             tension: 0.3,
             pointRadius: 4,
-            pointBackgroundColor: "#3B82F6",
-            pointBorderColor: "#3B82F6",
+            pointBackgroundColor: "#111",
+            pointBorderColor: "#111",
           },
           {
-            label: "Selesai",
+            label: "Complete",
             data: data.selesai,
-            borderColor: "#22C55E",
+            borderColor: "#E61919",
             backgroundColor: "transparent",
             borderWidth: 2,
             borderDash: [6, 3],
             fill: false,
             tension: 0.3,
             pointRadius: 4,
-            pointBackgroundColor: "#22C55E",
-            pointBorderColor: "#22C55E",
+            pointBackgroundColor: "#E61919",
+            pointBorderColor: "#E61919",
           },
         ],
       },
@@ -464,8 +447,8 @@ function useLineChart(data: { months: string[]; baru: number[]; selesai: number[
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: { grid: { display: false }, ticks: { font: { family: "ui-monospace, Consolas, monospace", size: 10 } } },
-          y: { beginAtZero: true, grid: { color: "#ddd" }, ticks: { font: { family: "ui-monospace, Consolas, monospace", size: 10 }, stepSize: 1 } },
+          x: { grid: { display: false }, ticks: { font: { family: "JetBrains Mono, ui-monospace, monospace", size: 10 } } },
+          y: { beginAtZero: true, grid: { color: "#D4D4D0" }, ticks: { font: { family: "JetBrains Mono, ui-monospace, monospace", size: 10 }, stepSize: 1 } },
         },
         plugins: { legend: { display: false }, tooltip: { enabled: true } },
       },

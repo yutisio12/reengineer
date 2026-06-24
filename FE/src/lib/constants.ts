@@ -19,12 +19,12 @@ export const STATUS_LABEL: Record<DrawingStatus, string> = {
 }
 
 export const STATUS_COLOR: Record<DrawingStatus, string> = {
-  assigned: "bg-yellow-500 text-black",
-  in_progress_drafter: "bg-green-500 text-white",
-  in_progress_checker: "bg-green-500 text-white",
-  in_progress_engineer: "bg-green-500 text-white",
-  fully_approved: "bg-green-700 text-white",
-  transmitted: "bg-blue-600 text-white",
+  assigned: "bg-white text-black",
+  in_progress_drafter: "bg-black text-white",
+  in_progress_checker: "bg-black text-white",
+  in_progress_engineer: "bg-black text-white",
+  fully_approved: "bg-black text-white",
+  transmitted: "bg-black text-white",
 }
 
 export const ROLES = ["admin", "drafter", "checker", "engineer"] as const
@@ -35,3 +35,5 @@ export type Stage = (typeof STAGES)[number]
 
 export const ACTIONS = ["start", "stop", "submit", "return", "approve"] as const
 export type Action = (typeof ACTIONS)[number]
+
+export const APP_VERSION = "2.4"

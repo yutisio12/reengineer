@@ -13,7 +13,7 @@ export async function showConfirm(title: string, text?: string): Promise<boolean
     reverseButtons: true,
     customClass: {
       popup: NEO_POPUP,
-      confirmButton: "swal2-confirm--green",
+      confirmButton: "swal2-confirm--primary",
       cancelButton: "swal2-cancel--black",
     },
   })

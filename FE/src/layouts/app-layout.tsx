@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Outlet, Link, useLocation, Navigate, useNavigate } from "react-router-dom"
 import { useAuth } from "../providers/auth-provider"
+import { APP_VERSION } from "../lib/constants"
 import {
   LogOut,
   FileText,
@@ -151,7 +152,7 @@ export function AppLayout() {
 
   return (
     <div className="h-full bg-white flex flex-col">
-      <header className="bg-green-600 border-b-4 border-black shrink-0">
+      <header className="border-b-4 border-black shrink-0" style={{ background: "#E61919" }}>
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center gap-6">
             <Link to="/drawings" className="flex items-center gap-3 py-3">
@@ -176,7 +177,7 @@ export function AppLayout() {
                       "px-4 py-4 font-mono font-bold text-xs uppercase border-l-2 border-white/20 transition-all",
                       isActive
                         ? "bg-black text-white"
-                        : "text-white hover:bg-green-700",
+                        : "text-white",
                     )}
                   >
                     {mod.label}
@@ -189,7 +190,7 @@ export function AppLayout() {
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <div className="text-white font-mono text-xs font-bold">{user.name}</div>
-              <div className="text-yellow-300 font-mono text-[10px] font-bold uppercase">{user.role}</div>
+              <div className="font-mono text-[10px] font-bold uppercase text-white/60">{user.role}</div>
             </div>
             <button
               onClick={logout}
@@ -203,9 +204,9 @@ export function AppLayout() {
       </header>
 
       <div className="flex flex-1 min-h-0">
-        <aside className="w-56 shrink-0 bg-gray-50 border-r-4 border-black flex flex-col overflow-y-auto">
+        <aside className="w-56 shrink-0 border-r-4 border-black flex flex-col overflow-y-auto" style={{ background: "#EAE8E3" }}>
           <div className="border-b-4 border-black px-5 py-4 shrink-0">
-            <h2 className="font-mono font-bold text-xs uppercase text-gray-500 tracking-wider">
+            <h2 className="micro text-xs font-bold text-gray-500">
               {modules.find((m) => m.id === activeModule)?.label}
             </h2>
           </div>
@@ -217,7 +218,7 @@ export function AppLayout() {
                 <div key={group.label}>
                   <button
                     onClick={() => toggleGroup(group.label)}
-                    className="w-full flex items-center gap-3 px-4 py-3 font-mono font-bold text-xs uppercase border-2 border-transparent hover:border-gray-300 hover:bg-gray-100 transition-all text-gray-500"
+                    className="w-full flex items-center gap-3 px-4 py-3 font-mono font-bold text-xs uppercase border-2 border-transparent hover:border-black transition-all text-gray-500"
                   >
                     {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                     {group.label}
@@ -235,8 +236,9 @@ export function AppLayout() {
                             className={cn(
                               "flex items-center gap-3 px-4 py-2.5 font-mono font-bold text-xs uppercase border-2 transition-all",
                               isActive
-                                ? "bg-green-600 text-white border-green-600"
-                                : "text-gray-700 border-transparent hover:border-gray-300 hover:bg-gray-100",
+                                ? "text-white"
+                                : "border-transparent text-black hover:border-black",
+                              isActive ? "bg-[#E61919] border-[#E61919]" : "hover:bg-[#D4D4D0]"
                             )}
                           >
                             <Icon size={15} />
@@ -253,8 +255,21 @@ export function AppLayout() {
           </nav>
         </aside>
 
-        <main className="flex-1 p-8">
-          <Outlet />
+        <main className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 p-8 overflow-y-auto">
+            <Outlet />
+          </div>
+          <footer className="shrink-0 border-t-4 border-black px-8 py-3 flex items-center justify-between" style={{ background: "#EAE8E3" }}>
+            <div className="flex items-center gap-4">
+              <span className="micro text-[10px] font-bold text-gray-500">© 2026 ENGINEERING ACTIVITY TRACKER</span>
+              <span className="text-gray-400 micro text-[10px]">REV 2.6 /// UNIT / D-01</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="micro text-[10px] font-bold text-gray-500">ENGINEERING MODULE ®</span>
+              <span className="micro text-[10px] font-bold" style={{ color: "#E61919" }}>///</span>
+              <span className="micro text-[10px] font-bold text-gray-500">v{APP_VERSION}</span>
+            </div>
+          </footer>
         </main>
       </div>
     </div>
