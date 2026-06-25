@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "be-auditor": {
+      "description": "Audit backend NestJS — security, speed, performance & professional standards"
+    },
+    "fe-auditor": {
+      "description": "Audit frontend React — security, speed, performance & professional standards"
+    }
+  }
+}
