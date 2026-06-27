@@ -47,15 +47,42 @@ $ npm run start:prod
 ## Run tests
 
 ```bash
-# unit tests
-$ npm run test
+# unit tests (all *.spec.ts files)
+$ npm test
 
-# e2e tests
-$ npm run test:e2e
+# watch mode — re-run on file changes
+$ npm run test:watch
 
-# test coverage
+# test coverage report
 $ npm run test:cov
+
+# e2e tests (requires running database)
+$ npm run test:e2e
 ```
+
+### Unit test structure
+
+Tests are co-located next to their source files using `*.spec.ts` naming:
+
+```
+src/
+├── modules/
+│   ├── auth/auth.service.spec.ts          — login, getProfile
+│   ├── master/master.service.spec.ts      — CRUD companies, projects, modules, dll
+│   ├── drawing/drawing.service.spec.ts    — drawing lifecycle, actions, revisions
+│   ├── production/production.service.spec.ts — production drawings, raise revision
+│   └── transmit/transmit.service.spec.ts  — transmittal flow
+└── app.controller.spec.ts                 — root endpoint
+```
+
+Each test file covers **positive scenarios** (success path) and **negative scenarios** (validation errors, not found, conflicts, invalid transitions, authorization).
+
+### Tech stack
+
+- **Jest 30** — test runner
+- **ts-jest** — TypeScript transformation
+- **@nestjs/testing** — NestJS testing utilities (Test.createTestingModule)
+- Repositories are mocked via `getRepositoryToken()` from `@nestjs/typeorm`
 
 ## Deployment
 
