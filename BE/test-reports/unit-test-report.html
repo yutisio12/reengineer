@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Test Report — Engineering Tracker BE</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1a202c;
+      padding: 2rem;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    .report-header {
+      background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+      color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .report-header h1 { font-size: 1.5rem; font-weight: 700; }
+    .report-header .subtitle { font-size: 0.875rem; color: #a0aec0; margin-top: 0.25rem; }
+    .report-actions { display: flex; gap: 0.75rem; }
+    .btn-pdf {
+      background: #e53e3e;
+      color: #fff;
+      border: none;
+      padding: 0.625rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-pdf:hover { background: #c53030; }
+    .btn-pdf svg { width: 18px; height: 18px; fill: currentColor; }
+
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .summary-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .summary-card .number { font-size: 2rem; font-weight: 700; line-height: 1.2; }
+    .summary-card .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #718096; margin-top: 0.25rem; }
+    .card-total .number { color: #2d3748; }
+    .card-passed .number { color: #38a169; }
+    .card-failed .number { color: #e53e3e; }
+    .card-pending .number { color: #d69e2e; }
+    .card-suites .number { color: #3182ce; }
+    .card-duration .number { color: #805ad5; font-size: 1.5rem; }
+
+    .suite {
+      background: #fff;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .suite-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+    .suite-header:hover { background: #f7fafc; }
+    .suite-toggle { font-size: 0.625rem; color: #a0aec0; transition: transform 0.2s; }
+    .suite.collapsed .suite-toggle { transform: rotate(-90deg); }
+    .suite.collapsed .suite-tests { display: none; }
+    .suite-status { font-size: 1rem; font-weight: 700; }
+    .suite-passed .suite-status { color: #38a169; }
+    .suite-failed .suite-status { color: #e53e3e; }
+    .suite-pending .suite-status { color: #d69e2e; }
+    .suite-name { flex: 1; font-size: 0.9375rem; font-weight: 600; color: #2d3748; }
+    .suite-duration { font-size: 0.8125rem; color: #718096; font-variant-numeric: tabular-nums; }
+
+    .suite-tests { border-top: 1px solid #edf2f7; }
+    .test-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.625rem 1.25rem 0.625rem 2.5rem;
+      font-size: 0.875rem;
+      border-bottom: 1px solid #f7fafc;
+      flex-wrap: wrap;
+    }
+    .test-row:last-child { border-bottom: none; }
+    .test-status { font-weight: 700; }
+    .test-passed .test-status { color: #38a169; }
+    .test-failed .test-status { color: #e53e3e; }
+    .test-pending .test-status { color: #d69e2e; }
+    .test-title { flex: 1; color: #4a5568; }
+    .test-duration { font-size: 0.75rem; color: #a0aec0; font-variant-numeric: tabular-nums; }
+
+    .failure-details { width: 100%; margin-top: 0.5rem; }
+    .failure-details pre {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      color: #c53030;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 2rem 0 1rem;
+      font-size: 0.75rem;
+      color: #a0aec0;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .report-header { border-radius: 0; }
+      .btn-pdf { display: none !important; }
+      .suite { break-inside: avoid; box-shadow: none; border: 1px solid #e2e8f0; }
+      .summary-card { box-shadow: none; border: 1px solid #e2e8f0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="report-header">
+      <div>
+        <h1>Unit Test Report</h1>
+        <div class="subtitle">Engineering Activity Tracker — Backend &middot; 2026-06-29</div>
+      </div>
+      <div class="report-actions">
+        <button class="btn-pdf" onclick="window.print()">
+          <svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-card card-total">
+        <div class="number">84</div>
+        <div class="label">Total Tests</div>
+      </div>
+      <div class="summary-card card-passed">
+        <div class="number">84</div>
+        <div class="label">Passed</div>
+      </div>
+      <div class="summary-card card-failed">
+        <div class="number">0</div>
+        <div class="label">Failed</div>
+      </div>
+      <div class="summary-card card-pending">
+        <div class="number">0</div>
+        <div class="label">Pending</div>
+      </div>
+      <div class="summary-card card-suites">
+        <div class="number">6/6</div>
+        <div class="label">Suites Passed</div>
+      </div>
+      <div class="summary-card card-duration">
+        <div class="number">2.2s</div>
+        <div class="label">Duration</div>
+      </div>
+    </div>
+
+    <div id="suites">
+        <div class="suite suite-passed">
+          <div class="suite-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="suite-toggle">&#9660;</span>
+            <span class="suite-status">&#10003;</span>
+            <span class="suite-name">src\app.controller.spec.ts</span>
+            <span class="suite-duration">0.88s</span>
+          </div>
+          <div class="suite-tests">
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AppController › root › should return &quot;Hello World!&quot;</span>
+            <span class="test-duration">0.02s</span>
+            
+          </div>
+        </div>
+        </div>
+      
+        <div class="suite suite-passed">
+          <div class="suite-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="suite-toggle">&#9660;</span>
+            <span class="suite-status">&#10003;</span>
+            <span class="suite-name">src\modules\production\production.service.spec.ts</span>
+            <span class="suite-duration">1.24s</span>
+          </div>
+          <div class="suite-tests">
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">ProductionService › getProductionDrawings › should return all transmitted drawings without filters</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">ProductionService › getProductionDrawings › should filter by company_id, project_id, and module_id</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">ProductionService › getProductionDrawings › should filter by search term on document_no</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">ProductionService › getProductionDrawings › should return empty array when no transmitted drawings exist</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">ProductionService › raiseRevision › should raise a revision on a transmitted drawing</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">ProductionService › raiseRevision › should throw NotFoundException when drawing not found</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">ProductionService › raiseRevision › should throw NotFoundException when drawing is not transmitted</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        </div>
+        </div>
+      
+        <div class="suite suite-passed">
+          <div class="suite-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="suite-toggle">&#9660;</span>
+            <span class="suite-status">&#10003;</span>
+            <span class="suite-name">src\modules\transmit\transmit.service.spec.ts</span>
+            <span class="suite-duration">1.24s</span>
+          </div>
+          <div class="suite-tests">
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">TransmitService › getTransmittableDrawings › should return all fully_approved drawings</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">TransmitService › getTransmittableDrawings › should return empty array when no drawings are fully_approved</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">TransmitService › transmit › should transmit approved drawings successfully</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">TransmitService › transmit › should transmit multiple drawings successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">TransmitService › transmit › should throw NotFoundException when some drawings are not found</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">TransmitService › transmit › should throw BadRequestException when drawings are not fully_approved</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">TransmitService › transmit › should transmit without notes when notes is not provided</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        </div>
+        </div>
+      
+        <div class="suite suite-passed">
+          <div class="suite-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="suite-toggle">&#9660;</span>
+            <span class="suite-status">&#10003;</span>
+            <span class="suite-name">src\modules\auth\auth.service.spec.ts</span>
+            <span class="suite-duration">1.26s</span>
+          </div>
+          <div class="suite-tests">
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AuthService › login › should return token and user on successful login</span>
+            <span class="test-duration">0.02s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AuthService › login › should throw UnauthorizedException when email is not found</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AuthService › login › should throw UnauthorizedException when password does not match</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AuthService › login › should throw UnauthorizedException when account is inactive</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AuthService › login › should throw UnauthorizedException when user not found AND inactive check is bypassed</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AuthService › getProfile › should return user without password when found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">AuthService › getProfile › should throw UnauthorizedException when user not found</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        </div>
+        </div>
+      
+        <div class="suite suite-passed">
+          <div class="suite-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="suite-toggle">&#9660;</span>
+            <span class="suite-status">&#10003;</span>
+            <span class="suite-name">src\modules\drawing\drawing.service.spec.ts</span>
+            <span class="suite-duration">1.28s</span>
+          </div>
+          <div class="suite-tests">
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › findAll › should return paginated drawings without filters</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › findAll › should apply all provided filters</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › findAll › should return empty result when no drawings match</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › findOne › should return a drawing by id</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › findOne › should throw NotFoundException when drawing not found</span>
+            <span class="test-duration">0.02s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › create › should create a drawing successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › create › should throw ConflictException when document number already exists</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › update › should update a drawing successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › update › should throw NotFoundException when drawing not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › getActivities › should return activities for a drawing</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › getActivities › should throw NotFoundException when drawing not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › performAction › should perform start:drafter action from assigned status</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › performAction › should perform submit:checker from in_progress_drafter</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › performAction › should perform approve:engineer from in_progress_engineer</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › performAction › should perform return:drafter from in_progress_checker</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › performAction › should throw BadRequestException for invalid transition</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › performAction › should throw BadRequestException when return action without reason</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › performAction › should throw NotFoundException when drawing not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › getRevisions › should return revisions for a drawing</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › getRevisions › should throw NotFoundException when drawing not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › createRevision › should create a revision successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › createRevision › should throw NotFoundException when drawing not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › getFile › should return a file by id</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">DrawingService › getFile › should throw NotFoundException when file not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        </div>
+        </div>
+      
+        <div class="suite suite-passed">
+          <div class="suite-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="suite-toggle">&#9660;</span>
+            <span class="suite-status">&#10003;</span>
+            <span class="suite-name">src\modules\master\master.service.spec.ts</span>
+            <span class="suite-duration">1.32s</span>
+          </div>
+          <div class="suite-tests">
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getCompanies › should return all companies ordered by name ASC</span>
+            <span class="test-duration">0.02s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getCompanies › should return empty array when no companies exist</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createCompany › should create a company successfully</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createCompany › should throw ConflictException when company code already exists</span>
+            <span class="test-duration">0.02s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateCompany › should update a company successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateCompany › should throw NotFoundException when company not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateCompany › should throw ConflictException when updating to an existing code</span>
+            <span class="test-duration">0.01s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getProjects › should return all projects when no filter</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getProjects › should filter projects by company_id</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createProject › should create a project successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createProject › should throw NotFoundException when company not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateProject › should update a project successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateProject › should throw NotFoundException when project not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateProject › should throw NotFoundException when referenced company not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getModules › should return all modules when no filter</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createModule › should create a module successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createModule › should throw NotFoundException when project not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateModule › should update a module successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateModule › should throw NotFoundException when module not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getDrawingTypes › should return all drawing types</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createDrawingType › should create a drawing type successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createDrawingType › should throw ConflictException when code already exists</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateDrawingType › should update a drawing type successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateDrawingType › should throw NotFoundException when not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getDisciplines › should return all disciplines</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createDiscipline › should create a discipline successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createDiscipline › should throw ConflictException when code already exists</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateDiscipline › should update a discipline successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateDiscipline › should throw NotFoundException when not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getUsers › should return all users when no role filter</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › getUsers › should filter users by role</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createUser › should create a user successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createUser › should throw ConflictException when email already exists</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › createUser › should use default password when not provided</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateUser › should update a user successfully</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateUser › should throw NotFoundException when user not found</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateUser › should throw ConflictException when email is taken by another user</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        
+          <div class="test-row test-passed">
+            <span class="test-status">&#10003;</span>
+            <span class="test-title">MasterService › updateUser › should hash password when updating password</span>
+            <span class="test-duration">0.00s</span>
+            
+          </div>
+        </div>
+        </div>
+      </div>
+
+    <div class="footer">
+      Generated by Jest &middot; Engineering Tracker BE
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.suite-header').forEach(function(header) {
+      header.addEventListener('click', function() {
+        this.parentElement.classList.toggle('collapsed');
+      });
+    });
+  </script>
+</body>
+</html>
