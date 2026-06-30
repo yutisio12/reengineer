@@ -84,6 +84,20 @@ Each test file covers **positive scenarios** (success path) and **negative scena
 - **@nestjs/testing** — NestJS testing utilities (Test.createTestingModule)
 - Repositories are mocked via `getRepositoryToken()` from `@nestjs/typeorm`
 
+### HTML Report
+
+Setelah `npm test`, report HTML otomatis dibuat di:
+
+```
+test-reports/unit-test-report.html
+```
+
+Buka file itu di browser untuk melihat hasil test dalam bentuk UI dengan:
+- Ringkasan statistik (total, passed, failed, pending, duration)
+- Detail per test suite (collapsible)
+- Detail error untuk test yang failed
+- **Tombol "Download PDF"** — klik untuk print/save sebagai PDF via browser
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
