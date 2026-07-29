@@ -40,7 +40,7 @@ interface SidebarGroup {
 
 const modules: Module[] = [
   { id: "dashboard", label: "Dashboard", path: "/" },
-  { id: "drawing", label: "Drawing Activity", path: "/drawings" },
+  { id: "drawing", label: "Drawing Activities", path: "/drawings" },
   { id: "production", label: "Production", path: "/production" },
   { id: "master", label: "Master Data", path: "/master/companies" },
 ]
