@@ -79,7 +79,7 @@ export default function DrawingCreatePage() {
                   className="w-full border-4 border-black px-4 py-3 font-mono text-sm focus:outline-none"
                   style={{ background: "#F4F4F0", color: "#111" }}
                 >
-                  <option value="">[ SELECT COMPANY ]</option>
+                  <option value="">[ --SELECT COMPANY-- ]</option>
                   {companies?.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
