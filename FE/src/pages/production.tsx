@@ -82,7 +82,7 @@ export default function ProductionPage() {
           style={{ background: "#E61919", color: "#fff" }}
         >
           <FileSpreadsheet size={16} />
-          [ EXPORT EXCEL ]
+          [ EXPORT to EXCEL ]
         </button>
       </div>
 
