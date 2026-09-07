@@ -42,7 +42,7 @@ export default function DrawingCreatePage() {
     if (!confirmed) return
     try {
       await createMutation.mutateAsync(form)
-      showToast("success!", "Drawing created")
+      showToast("success!", "Drawing Registered!")
       navigate("/drawings")
     } catch {
       showToast("error", "Failed to create drawing!")
