@@ -24,7 +24,7 @@ export class ProductionController {
     return this.productionService.getProductionDrawings(company_id, project_id, module_id, search);
   }
 
-  @ApiOperation({ summary: 'Raise a revision for a production drawing' })
+  @ApiOperation({ summary: 'Raise a revision for drawing' })
   @Post('drawings/:id/raise-revision')
   raiseRevision(
     @Param('id') id: string,
