@@ -135,7 +135,7 @@ export class DrawingService {
 
     if (!nextStatus) {
       throw new BadRequestException(
-        `Cannot perform '${dto.action}' on stage '${dto.stage}' for drawing in status '${drawing.status}'`,
+        `Cannot perform '${dto.action}' on stage '${dto.stage}' for drawing in status '${drawing.status}'!`,
       );
     }
 
