@@ -39,7 +39,7 @@ export class DrawingController {
     return this.drawingService.findAll(query);
   }
 
-  @ApiOperation({ summary: 'Get a drawing by ID' })
+  @ApiOperation({ summary: 'Get a specific drawing by ID' })
   @Get('drawings/:id')
   findOne(@Param('id') id: string) {
     return this.drawingService.findOne(id);
