@@ -45,7 +45,7 @@ export class DrawingController {
     return this.drawingService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Create a new drawing' })
+  @ApiOperation({ summary: 'Create new drawing' })
   @Post('drawings')
   create(@Body() dto: CreateDrawingDto, @CurrentUser() user: User) {
     return this.drawingService.create(dto, user.id);
