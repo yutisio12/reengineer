@@ -13,7 +13,7 @@ import { RaiseRevisionDto } from './dto/raise-revision.dto';
 export class ProductionController {
   constructor(private productionService: ProductionService) {}
 
-  @ApiOperation({ summary: 'Get production drawings with optional filters' })
+  @ApiOperation({ summary: 'Get drawings with filters' })
   @Get('drawings')
   getDrawings(
     @Query('company_id') company_id?: string,
