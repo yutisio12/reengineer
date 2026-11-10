@@ -33,7 +33,7 @@ export class DrawingController {
     private fileRepo: Repository<RevisionFile>,
   ) {}
 
-  @ApiOperation({ summary: 'Get all drawings with filters' })
+  @ApiOperation({ summary: 'Get all drawings with filter' })
   @Get('drawings')
   findAll(@Query() query: QueryDrawingDto) {
     return this.drawingService.findAll(query);
