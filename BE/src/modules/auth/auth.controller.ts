@@ -15,7 +15,7 @@ export class AuthController {
     private seedService: SeedService,
   ) {}
 
-  @ApiOperation({ summary: 'Sign in with username and password' })
+  @ApiOperation({ summary: 'Sign in with registered credential' })
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
