@@ -23,7 +23,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: 'Get current authenticated user profile' })
+  @ApiOperation({ summary: 'Get current user' })
   @Get('me')
   getProfile(@CurrentUser() user: User) {
     return this.authService.getProfile(user.id);
